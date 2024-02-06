@@ -1,0 +1,189 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/grey_rounded_background_10"
+    android:layout_marginTop="8dp"
+    android:layout_marginBottom="8dp"
+    android:layout_marginStart="16dp"
+    android:layout_marginEnd="16dp"
+    android:layout_alignParentEnd="true">
+
+    <RelativeLayout
+        android:id="@+id/inventoryItemLayout"
+        android:layout_width="380dp"
+        android:layout_height="90dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:padding="16dp">
+
+        <ImageView
+            android:id="@+id/inventoryIcon"
+            android:layout_width="23dp"
+            android:layout_height="23dp"
+            android:layout_marginStart="15dp"
+            android:layout_centerVertical="true"/>
+
+        <ImageView
+            android:id="@+id/arrow_extra_unique"
+            android:layout_width="14dp"
+            android:layout_height="14dp"
+            android:layout_marginStart="270dp"
+            android:layout_centerVertical="true"
+            android:src="@drawable/black_down_arrow" />
+
+        <TextView
+            android:id="@+id/inventoryText1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="50dp"
+            android:layout_marginTop="10dp"
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true"
+            android:textColor="@color/black"
+            android:textSize="25dp"
+            android:text="Item Name" />
+
+
+    </RelativeLayout>
+
+    <net.cachapa.expandablelayout.ExpandableLayout
+        android:id="@+id/expandableLayout"
+        android:layout_width="match_parent"
+        android:layout_height="220dp"
+        android:layout_below="@id/inventoryItemLayout"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp">
+
+            <ImageView
+                android:id="@+id/expandedImageView"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_centerHorizontal="true" />
+
+            <TextView
+                android:id="@+id/expandedTextView"
+                android:layout_width="110dp"
+                android:layout_height="50dp"
+                android:layout_alignParentBottom="true"
+                android:layout_marginBottom="10dp"
+                android:layout_marginLeft="10dp"
+                android:background="@drawable/green_button_rounded"
+                android:textColor="@color/white"
+                android:textSize="20dp"
+                android:text="Edit"
+                android:gravity="center"/>
+
+
+            <TextView
+                android:id="@+id/bikePrice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_marginTop="-8dp"
+                android:textColor="@color/black"
+                android:textSize="22dp"
+                android:text="Price:"/>
+
+            <TextView
+                android:id="@+id/price_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="-8dp"
+                android:layout_marginLeft="130dp"
+                android:textColor="@color/black"
+                android:textSize="22dp"
+                android:text="$XX.XX"/>
+
+
+            <TextView
+                android:id="@+id/bikeRating"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_marginTop="50dp"
+                android:textColor="@color/black"
+                android:textSize="22dp"
+                android:text="Rating:"/>
+
+            <TextView
+                android:id="@+id/rating_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="130dp"
+                android:layout_marginTop="50dp"
+                android:textColor="@color/black"
+                android:textSize="22dp"
+                android:text="XYZ City"/>
+
+            <TextView
+                android:id="@+id/inUse"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_marginTop="20dp"
+                android:textColor="@color/black"
+                android:textSize="22dp"
+                android:text="In Use:"/>
+
+            <TextView
+                android:id="@+id/inUse_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="130dp"
+                android:layout_marginTop="20dp"
+                android:textColor="@color/black"
+                android:textSize="22dp"
+                android:text="No"/>
+
+            <TextView
+                android:id="@+id/bikeLocation"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_marginTop="80dp"
+                android:textColor="@color/black"
+                android:textSize="22dp"
+                android:text="Location:"/>
+
+            <TextView
+                android:id="@+id/location_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="130dp"
+                android:layout_marginTop="80dp"
+                android:textColor="@color/black"
+                android:textSize="22dp"
+                android:text="XYZ City"/>
+
+
+            <Button
+                android:id="@+id/edit_inventory_item"
+                android:layout_width="110dp"
+                android:layout_height="50dp"
+                android:layout_alignParentBottom="true"
+                android:layout_marginBottom="10dp"
+                android:layout_marginLeft="10dp"
+                android:background="@drawable/green_button_rounded"
+                android:textColor="@color/white"
+                android:text="Edit" />
+
+            <Button
+                android:id="@+id/delete_inventory_item"
+                android:layout_width="110dp"
+                android:layout_height="50dp"
+                android:layout_alignParentBottom="true"
+                android:layout_marginBottom="10dp"
+                android:layout_marginLeft="180dp"
+                android:background="@drawable/red_rounded_baclground_15"
+                android:textColor="@color/white"
+                android:text="Delete" />
+
+
+        </RelativeLayout>
+
+    </net.cachapa.expandablelayout.ExpandableLayout>
+</RelativeLayout>

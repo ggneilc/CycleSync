@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    tools:context=".CreateAccountActivity">
+
+    <ImageView
+        android:id="@+id/myImageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/bike_logo"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.106" />
+
+    <TextView
+        android:id="@+id/textViewAppName"
+        style="@style/AppTitleText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="CycleSync"
+        android:textStyle="bold"
+        android:layout_gravity="center"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHorizontal_bias="0.531"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.287" />
+
+    <EditText
+        android:id="@+id/editTextNewName"
+        android:layout_width="300dp"
+        android:layout_height="80dp"
+        android:layout_marginTop="20dp"
+        android:hint="Name"
+        android:background="@drawable/grey_rounded_background_15"
+        android:paddingHorizontal="40dp"
+        android:textFontWeight="500"
+        app:layout_constraintTop_toBottomOf="@+id/textViewAppName"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent" />
+
+    <EditText
+        android:id="@+id/editTextNewEmail"
+        android:layout_width="300dp"
+        android:layout_height="80dp"
+        android:layout_marginTop="20dp"
+        android:hint="Email"
+        android:background="@drawable/grey_rounded_background_15"
+        android:paddingHorizontal="40dp"
+        android:textFontWeight="500"
+        android:inputType="textEmailAddress"
+        app:layout_constraintTop_toBottomOf="@+id/editTextNewName"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent" />
+
+    <EditText
+        android:id="@+id/editTextNewPassword"
+        android:layout_width="300dp"
+        android:layout_height="80dp"
+        android:layout_marginTop="20dp"
+        android:hint="Password"
+        android:background="@drawable/grey_rounded_background_15"
+        android:paddingHorizontal="40dp"
+        android:textFontWeight="500"
+        android:inputType="textPassword"
+        app:layout_constraintTop_toBottomOf="@+id/editTextNewEmail"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent" />
+
+    <Button
+        style="@style/GreenButton"
+        android:id="@+id/buttonCreateAccount"
+        android:layout_width="300dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="32dp"
+        android:background="@drawable/green_button_rounded"
+        android:text="Create Account"
+        android:fontFamily="@font/poppins_bold"
+        android:textFontWeight="500"
+        android:textColor="#FFFFFF"
+        android:stateListAnimator="@null"
+        android:textAllCaps="false"
+        app:layout_constraintHorizontal_bias="0.495"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/editTextNewPassword"  />
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,364 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > RentalController</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">cyclesync.Rentals</a>
+</div>
+
+<h1>Coverage Summary for Class: RentalController (cyclesync.Rentals)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RentalController</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (5/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    11.5%
+  </span>
+  <span class="absValue">
+    (11/96)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package cyclesync.Rentals;
+&nbsp;
+&nbsp;import java.util.*;
+&nbsp;
+&nbsp;import org.springframework.beans.factory.annotation.Autowired;
+&nbsp;import org.springframework.web.bind.annotation.DeleteMapping;
+&nbsp;import org.springframework.web.bind.annotation.GetMapping;
+&nbsp;import org.springframework.web.bind.annotation.PathVariable;
+&nbsp;import org.springframework.web.bind.annotation.PostMapping;
+&nbsp;import org.springframework.web.bind.annotation.PutMapping;
+&nbsp;import org.springframework.web.bind.annotation.RequestBody;
+&nbsp;import org.springframework.web.bind.annotation.RestController;
+&nbsp;
+&nbsp;import cyclesync.Users.User;
+&nbsp;import cyclesync.Bikes.Bike;
+&nbsp;import cyclesync.Bikes.BikeRepository;
+&nbsp;import cyclesync.Users.UserRepository;
+&nbsp;import cyclesync.Websockets.GlobalBikeMap;
+&nbsp;
+&nbsp;
+&nbsp;/**
+&nbsp; * @Author Neil Choromokos &amp; Caleb Lemmons
+&nbsp; * Neil: Setup class: Constructors, getters, setters
+&nbsp; * Thomas: Added rental Previews
+&nbsp; */
+&nbsp;
+&nbsp;@RestController
+<b class="fc">&nbsp;public class RentalController {</b>
+&nbsp;
+&nbsp;    @Autowired
+&nbsp;    RentalRepository rentalRepository;
+&nbsp;    @Autowired
+&nbsp;    UserRepository userRepository;
+&nbsp;    @Autowired
+&nbsp;    BikeRepository bikeRepository;
+&nbsp;    @Autowired
+&nbsp;    private GlobalBikeMap globalBikeMap;
+&nbsp;
+<b class="fc">&nbsp;    private String success = &quot;{\&quot;message\&quot;:\&quot;success\&quot;}&quot;;</b>
+<b class="fc">&nbsp;    private String failure = &quot;{\&quot;message\&quot;:\&quot;failure\&quot;}&quot;;</b>
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;    //-------------------------- CRUD Operations ------------------// 
+&nbsp;    //Renters can create/update/list/delete their rentals
+&nbsp;    @GetMapping(path = &quot;/rentals&quot;)
+&nbsp;    List&lt;Rental&gt; getAllRentals(){
+<b class="fc">&nbsp;        return rentalRepository.findAll();</b>
+&nbsp;    }
+&nbsp;    @GetMapping(path = &quot;/rentals/{id}&quot;)
+&nbsp;    Rental getRentalById(@PathVariable int id){
+<b class="fc">&nbsp;        return rentalRepository.findById(id).orElse(null);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @GetMapping(path=&quot;/rentals/user/{userId}&quot;)
+&nbsp;    List&lt;RentalPreview&gt; getRentalsByUserId(@PathVariable int userId) {
+<b class="fc">&nbsp;        Optional&lt;User&gt; optionalUser = userRepository.findById(userId);</b>
+<b class="fc">&nbsp;        if (!optionalUser.isPresent()) {</b>
+<b class="fc">&nbsp;            return Collections.emptyList();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        User user = optionalUser.get();</b>
+<b class="nc">&nbsp;        List&lt;Rental&gt; rentals = user.getRentals();</b>
+<b class="nc">&nbsp;        List&lt;RentalPreview&gt; results = new ArrayList&lt;RentalPreview&gt;();</b>
+<b class="nc">&nbsp;        for (Rental rental: rentals) {</b>
+<b class="nc">&nbsp;            Optional&lt;User&gt; optionalRenter = userRepository.findById(rental.getRenter_id());</b>
+<b class="nc">&nbsp;            if (!optionalRenter.isPresent()) {</b>
+<b class="nc">&nbsp;                return results;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            User renter = optionalRenter.get();</b>
+<b class="nc">&nbsp;            String renter_name = renter.getFirstName() + &quot; &quot; + renter.getLastName();</b>
+<b class="nc">&nbsp;            Optional&lt;Bike&gt; optionalBike = bikeRepository.findById((rental.getBikeId()));</b>
+<b class="nc">&nbsp;            if (!optionalBike.isPresent()) {</b>
+<b class="nc">&nbsp;                return results;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            Bike bike = optionalBike.get();</b>
+<b class="nc">&nbsp;            String rating = rental.getRating() + &quot;/5&quot;;</b>
+<b class="nc">&nbsp;            RentalPreview rentalPreview = new RentalPreview(renter_name, rating, bike.getName(), bike.isElectric(), bike.getId(), rental.getDate(), rental.getStop_date(), bike.getPrice(), bike.getLocation(), rental.getReview());</b>
+<b class="nc">&nbsp;            results.add(rentalPreview);</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return results;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    //User who created rental is set to RenterID, therefore need user
+&nbsp;//    @PostMapping(path = &quot;/users/{id}/rentals/bike/{bikeid}&quot;)
+&nbsp;//    String createRental(@RequestBody Rental rental, @PathVariable int id, @PathVariable int bid){
+&nbsp;//        Optional&lt;User&gt; optionalUser = userRepository.findById(id);
+&nbsp;//        if (!optionalUser.isPresent()) {
+&nbsp;//            return failure;
+&nbsp;//        }
+&nbsp;//        User user = optionalUser.get();
+&nbsp;//
+&nbsp;//        Optional&lt;Bike&gt; optionalBike = bikeRepository.findById(bid);
+&nbsp;//        if (!optionalBike.isPresent()) {
+&nbsp;//            return failure;
+&nbsp;//        }
+&nbsp;//        Bike bike = optionalBike.get();
+&nbsp;//
+&nbsp;//        if (rental == null) {
+&nbsp;//            return failure;
+&nbsp;//        }
+&nbsp;//
+&nbsp;//        rental.setRenter(user);
+&nbsp;//        rental.setBike(bike);
+&nbsp;//        rentalRepository.save(rental);
+&nbsp;//
+&nbsp;//        String rentalJson = &quot;{\&quot;alertType\&quot;:\&quot;bikeOpen\&quot;, \&quot;bikeId\&quot;:&quot;+bid+&quot;}&quot;;
+&nbsp;//        globalBikeMap.broadcast(rentalJson);
+&nbsp;//
+&nbsp;//        return success;
+&nbsp;//    }
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;    // Initiate rental for a user
+&nbsp;    @GetMapping(path=&quot;/users/{id}/rent/{bikeId}&quot;)
+&nbsp;    String initiateRental(@PathVariable int id, @PathVariable int bikeId) {
+&nbsp;        // Check if user exists
+<b class="fc">&nbsp;        Optional&lt;User&gt; optionalUser = userRepository.findById(id);</b>
+<b class="fc">&nbsp;        if (!optionalUser.isPresent()) {</b>
+<b class="fc">&nbsp;            return failure;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        User user = optionalUser.get();</b>
+&nbsp;        // Check validity to rent
+<b class="nc">&nbsp;        if (user.getRental() != null) {</b>
+&nbsp;            // Already renting something!
+<b class="nc">&nbsp;            return failure;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Optional&lt;Bike&gt; optionalBike = bikeRepository.findById(bikeId);</b>
+<b class="nc">&nbsp;        if (!optionalBike.isPresent()) {</b>
+<b class="nc">&nbsp;            return failure;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Bike bike = optionalBike.get();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (!bike.getonMarket()) {</b>
+<b class="nc">&nbsp;            return failure;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Create new rental
+<b class="nc">&nbsp;        Rental newRental = new Rental(bike, user);</b>
+<b class="nc">&nbsp;        rentalRepository.save(newRental);</b>
+&nbsp;
+&nbsp;        // Set current rental
+<b class="nc">&nbsp;        user.setCurrentRental(newRental);</b>
+&nbsp;
+&nbsp;        // Add to crental history
+<b class="nc">&nbsp;        user.addRental(newRental);</b>
+<b class="nc">&nbsp;        userRepository.save(user);</b>
+&nbsp;
+&nbsp;        // Mark bike as off market
+<b class="nc">&nbsp;        bike.setOnMarket(false);</b>
+<b class="nc">&nbsp;        bikeRepository.save(bike);</b>
+&nbsp;
+<b class="nc">&nbsp;        String rentalJson = &quot;{\&quot;alertType\&quot;:\&quot;bikeRented\&quot;, \&quot;bikeId\&quot;:&quot;+bikeId+&quot;}&quot;;</b>
+<b class="nc">&nbsp;        globalBikeMap.broadcast(rentalJson);</b>
+&nbsp;
+<b class="nc">&nbsp;        return success;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @GetMapping(path=&quot;/rentals/stop/{userId}&quot;)
+&nbsp;    String stopRental(@PathVariable int userId) {
+&nbsp;        // Remove rental from user
+<b class="nc">&nbsp;        Optional&lt;User&gt; optionalRenter = userRepository.findById(userId);</b>
+<b class="nc">&nbsp;        if (!optionalRenter.isPresent()) {</b>
+<b class="nc">&nbsp;            return failure;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        User renter = optionalRenter.get();</b>
+&nbsp;
+&nbsp;        // Check if rental exists
+<b class="nc">&nbsp;        Rental rental = renter.getRental();</b>
+<b class="nc">&nbsp;        if (rental == null) {</b>
+<b class="nc">&nbsp;            return failure;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Check if rental is active
+<b class="nc">&nbsp;        if (!rental.getStatus().equals(&quot;active&quot;)) {</b>
+&nbsp;            // rental is not active
+<b class="nc">&nbsp;            return failure;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        renter.setCurrentRental(null);</b>
+&nbsp;
+<b class="nc">&nbsp;        Optional&lt;Bike&gt; optionalBike = bikeRepository.findById(rental.getBikeId());</b>
+<b class="nc">&nbsp;        if (!optionalBike.isPresent()) {</b>
+<b class="nc">&nbsp;            return failure;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Bike bike = optionalBike.get();</b>
+<b class="nc">&nbsp;        bike.setOnMarket(true);</b>
+&nbsp;
+<b class="nc">&nbsp;        rental.setStatus(&quot;inactive&quot;);</b>
+<b class="nc">&nbsp;        rental.setStopDate(new Date());</b>
+&nbsp;
+<b class="nc">&nbsp;        userRepository.save(renter);</b>
+<b class="nc">&nbsp;        bikeRepository.save(bike);</b>
+&nbsp;
+<b class="nc">&nbsp;        String rentalJson = &quot;{\&quot;alertType\&quot;:\&quot;bikeOpen\&quot;, \&quot;bikeId\&quot;:&quot;+bike.getId()+&quot;}&quot;;</b>
+<b class="nc">&nbsp;        globalBikeMap.broadcast(rentalJson);</b>
+&nbsp;
+<b class="nc">&nbsp;        return success;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    //Update Rental Information -&gt; Renter editing information
+&nbsp;    @PutMapping(path = &quot;/rentals/{id}&quot;)
+&nbsp;    Rental updateRental(@PathVariable int id, @RequestBody Rental request){
+<b class="nc">&nbsp;        Optional&lt;Rental&gt; optionalRental = rentalRepository.findById(id);</b>
+<b class="nc">&nbsp;        if (!optionalRental.isPresent()) {</b>
+&nbsp;            // Handle not found case
+<b class="nc">&nbsp;            return null; // or some appropriate error response</b>
+&nbsp;        }
+<b class="nc">&nbsp;        Rental rental = optionalRental.get();</b>
+&nbsp;
+<b class="nc">&nbsp;        if(rental == null)</b>
+<b class="nc">&nbsp;            return null;</b>
+<b class="nc">&nbsp;        rentalRepository.save(request);</b>
+<b class="nc">&nbsp;        return rentalRepository.findById(id).orElse(null);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    @DeleteMapping(path = &quot;/rentals/{id}&quot;)
+&nbsp;    String deleteRental(@PathVariable int id){
+<b class="nc">&nbsp;        rentalRepository.deleteById(id);</b>
+<b class="nc">&nbsp;        return success;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @GetMapping(path=&quot;/rentals/wipe&quot;)
+&nbsp;    String wipeRentals() {
+<b class="nc">&nbsp;        rentalRepository.deleteAll();</b>
+<b class="nc">&nbsp;        return success;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @PostMapping(path=&quot;/rentals/review/{id}&quot;)
+&nbsp;    String reviewRental(@PathVariable int id, @RequestBody RentalReviewRequest request) {
+<b class="nc">&nbsp;        Optional&lt;Rental&gt; optionalRental = rentalRepository.findById(id);</b>
+<b class="nc">&nbsp;        if (!optionalRental.isPresent()) {</b>
+&nbsp;            // Handle not found case
+<b class="nc">&nbsp;            return failure; // or some appropriate error response</b>
+&nbsp;        }
+<b class="nc">&nbsp;        Rental rental = optionalRental.get();</b>
+&nbsp;
+<b class="nc">&nbsp;        rental.setRating(request.getRating());</b>
+<b class="nc">&nbsp;        rental.setReview(request.getReview());</b>
+&nbsp;
+<b class="nc">&nbsp;        Optional&lt;Bike&gt; optionalBike = bikeRepository.findById(rental.getBikeId());</b>
+<b class="nc">&nbsp;        if (!optionalBike.isPresent()) {</b>
+<b class="nc">&nbsp;            return failure;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        Bike bike = optionalBike.get();</b>
+&nbsp;
+<b class="nc">&nbsp;        bike.addRating(request.getRating());</b>
+&nbsp;
+<b class="nc">&nbsp;        bikeRepository.save(bike);</b>
+&nbsp;
+<b class="nc">&nbsp;        rentalRepository.save(rental); // Save changes to the DB</b>
+&nbsp;
+<b class="nc">&nbsp;        return success;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2023-12-07 18:44</div>
+</div>
+</body>
+</html>

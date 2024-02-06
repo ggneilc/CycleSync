@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="GreenButton" parent="Widget.AppCompat.Button">
+        <item name="android:background">@color/green</item>
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:fontFamily">@font/poppins_bold</item>
+        <item name="android:textSize">20sp</item>
+    </style>
+
+    <style name="AppTitleText" parent="TextAppearance.AppCompat">
+        <item name="android:textColor">@color/darkgreen</item>
+        <item name="android:textSize">45sp</item>
+    </style>
+
+</resources>

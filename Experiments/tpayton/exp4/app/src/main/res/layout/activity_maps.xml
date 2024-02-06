@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MapsActivity">
+
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.70"
+        tools:layout="@layout/activity_maps" />
+
+
+    <View
+        android:id="@+id/background_view"
+        android:layout_width="340dp"
+        android:layout_height="80dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/white_rounded_button"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHorizontal_bias="0.492"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent" />
+
+    <Button
+        android:id="@+id/buttonRentNow"
+        style="@style/GreenButton"
+        android:layout_width="180dp"
+        android:layout_height="60dp"
+        android:background="@drawable/green_button_rounded"
+        android:text="@string/Rent_Now"
+        android:textColor="#FFFFFF"
+        app:layout_constraintBottom_toBottomOf="@+id/background_view"
+        app:layout_constraintEnd_toEndOf="@+id/background_view"
+        app:layout_constraintStart_toStartOf="@+id/background_view"
+        app:layout_constraintTop_toTopOf="@+id/background_view"
+        app:layout_constraintVertical_bias="0.75" />
+
+    <ImageView
+        android:id="@+id/settings"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:src="@drawable/settings"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHorizontal_bias="0.861"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.969" />
+
+    <ImageView
+        android:id="@+id/back"
+        android:layout_width="37dp"
+        android:layout_height="50dp"
+        android:src="@drawable/profile"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHorizontal_bias="0.155"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.969" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

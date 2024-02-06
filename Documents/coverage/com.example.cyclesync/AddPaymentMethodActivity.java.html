@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AddPaymentMethodActivity.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=0;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">debug</a> &gt; <a href="index.source.html" class="el_package">com.example.cyclesync</a> &gt; <span class="el_source">AddPaymentMethodActivity.java</span></div><h1>AddPaymentMethodActivity.java</h1><pre class="source lang-java linenums">package com.example.cyclesync;
+
+import android.os.Bundle;
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.content.Intent;
+import android.widget.Toast;
+
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+
+import org.json.JSONObject;
+
+<span class="fc" id="L21">public class AddPaymentMethodActivity extends AppCompatActivity {</span>
+
+    private EditText paymentMethodName;
+    private EditText cardHolderName;
+    private EditText cardNumber;
+    private EditText expiryDate;
+    private EditText cvv;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+<span class="fc" id="L31">        super.onCreate(savedInstanceState);</span>
+<span class="fc" id="L32">        setContentView(R.layout.add_payment_method_activity);</span>
+
+<span class="fc" id="L34">        paymentMethodName = findViewById(R.id.payment_method_name);</span>
+<span class="fc" id="L35">        cardHolderName = findViewById(R.id.card_holder_name);</span>
+<span class="fc" id="L36">        cardNumber = findViewById(R.id.card_number);</span>
+<span class="fc" id="L37">        expiryDate = findViewById(R.id.expiry_date);</span>
+<span class="fc" id="L38">        cvv = findViewById(R.id.cvv);</span>
+
+<span class="fc" id="L40">        ImageView backArrow = findViewById(R.id.back_arrow);</span>
+<span class="fc" id="L41">        backArrow.setOnClickListener(new View.OnClickListener() {</span>
+            @Override
+            public void onClick(View view) {
+<span class="nc" id="L44">                finish();</span>
+<span class="nc" id="L45">            }</span>
+        });
+
+<span class="fc" id="L48">        Button savePaymentMethodButton = findViewById(R.id.save_payment_method_button);</span>
+<span class="fc" id="L49">        savePaymentMethodButton.setOnClickListener(new View.OnClickListener() {</span>
+            @Override
+            public void onClick(View view) {
+                // Validate input fields
+<span class="pc bpc" id="L53" title="1 of 2 branches missed.">                if (isInputValid()) {</span>
+                    // Construct a payment method object or map from the inputs
+                    // Depending on how your PaymentMethod class is structured, you may need to create a new instance and set values, or build a map
+<span class="fc" id="L56">                    PaymentMethod newPaymentMethod = new PaymentMethod(</span>
+                            PaymentMethod.PaymentType.CREDIT_CARD,
+<span class="fc" id="L58">                            cardHolderName.getText().toString(),</span>
+<span class="fc" id="L59">                            paymentMethodName.getText().toString(),</span>
+<span class="fc" id="L60">                            cardNumber.getText().toString(),</span>
+<span class="fc" id="L61">                            expiryDate.getText().toString(),</span>
+<span class="fc" id="L62">                            cvv.getText().toString()</span>
+                    );
+
+<span class="fc" id="L65">                    sendAddPaymentMethodRequest(newPaymentMethod);</span>
+
+<span class="fc" id="L67">                } else {</span>
+<span class="nc" id="L68">                    Toast.makeText(AddPaymentMethodActivity.this, &quot;Please fill in all fields&quot;, Toast.LENGTH_SHORT).show();</span>
+                }
+<span class="fc" id="L70">            }</span>
+        });
+<span class="fc" id="L72">    }</span>
+
+    private boolean isInputValid() {
+        // Basic validation to check if the input fields are not empty
+        // More complex validation logic such as card number format, expiry date format, CVV number length, etc., can be added here
+<span class="pc bpc" id="L77" title="1 of 2 branches missed.">        return !paymentMethodName.getText().toString().trim().isEmpty() &amp;&amp;</span>
+<span class="pc bpc" id="L78" title="1 of 2 branches missed.">                !cardHolderName.getText().toString().trim().isEmpty() &amp;&amp;</span>
+<span class="pc bpc" id="L79" title="1 of 2 branches missed.">                !cardNumber.getText().toString().trim().isEmpty() &amp;&amp;</span>
+<span class="pc bpc" id="L80" title="1 of 2 branches missed.">                !expiryDate.getText().toString().trim().isEmpty() &amp;&amp;</span>
+<span class="pc bpc" id="L81" title="1 of 2 branches missed.">                !cvv.getText().toString().trim().isEmpty();</span>
+    }
+
+    private void sendAddPaymentMethodRequest(PaymentMethod newPaymentMethod) {
+<span class="fc" id="L85">        String URL = &quot;http://10.0.2.2:8080/payment_methods/&quot; + UserManager.getInstance().getUser().getId();</span>
+
+<span class="fc" id="L87">        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(</span>
+            Request.Method.POST,
+            URL,
+<span class="fc" id="L90">            new JSONObject(newPaymentMethod.toMap()), // Assuming your PaymentMethod object has a toMap() method that returns its properties as a Map</span>
+<span class="fc" id="L91">            new Response.Listener&lt;JSONObject&gt;() {</span>
+                @Override
+                public void onResponse(JSONObject response) {
+<span class="fc" id="L94">                    Log.d(&quot;Volley Response&quot;, response.toString());</span>
+
+                    try {
+<span class="fc" id="L97">                        String message = response.getString(&quot;message&quot;);</span>
+
+<span class="pc bpc" id="L99" title="1 of 2 branches missed.">                        if (message.equals(&quot;success&quot;)) {</span>
+<span class="fc" id="L100">                            finish();</span>
+<span class="fc" id="L101">                            Toast.makeText(AddPaymentMethodActivity.this, &quot;Payment Method Added&quot;, Toast.LENGTH_SHORT).show();</span>
+                        } else {
+                            // Something went wrong while creating the account. Handle the situation accordingly, maybe show an error message
+<span class="nc" id="L104">                            Toast.makeText(AddPaymentMethodActivity.this, &quot;Failed to add payment method, please try again&quot;, Toast.LENGTH_SHORT).show();</span>
+                        }
+<span class="nc" id="L106">                    } catch (Exception e) {</span>
+<span class="nc" id="L107">                        e.printStackTrace();</span>
+<span class="fc" id="L108">                    }</span>
+<span class="fc" id="L109">                }</span>
+            },
+<span class="fc" id="L111">            new Response.ErrorListener() {</span>
+                @Override
+                public void onErrorResponse(VolleyError error) {
+<span class="nc" id="L114">                    Log.e(&quot;Volley Error&quot;, error.toString());</span>
+<span class="nc" id="L115">                }</span>
+            }
+        );
+
+        // Add the request to the RequestQueue
+<span class="fc" id="L120">        VolleySingleton.getInstance(getApplicationContext()).addToRequestQueue(jsonObjectRequest);</span>
+<span class="fc" id="L121">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span>Generated by the Android Gradle plugin 8.1.1</div></body></html>

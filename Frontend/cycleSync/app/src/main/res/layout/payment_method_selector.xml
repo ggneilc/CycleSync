@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="16dp"
+    android:background="?attr/selectableItemBackground"
+    android:clickable="true"
+    android:focusable="true">
+
+    <ImageView
+        android:id="@+id/method_icon"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignParentStart="true"
+        android:layout_centerVertical="true"
+        android:src="@drawable/credit_card_icon" /> <!-- Replace with your credit card icon -->
+
+    <TextView
+        android:id="@+id/method_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@id/method_icon"
+        android:layout_marginStart="16dp"
+        android:layout_centerVertical="true"
+        android:textSize="20sp"
+        android:text="Payment Method Name" /> <!-- Placeholder for actual method name -->
+
+    <RadioButton
+        android:id="@+id/payment_method_radio_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_alignParentEnd="true"
+        android:button="@drawable/radio_button_selector" />
+
+</RelativeLayout>

@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>InventoryActivity.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=0;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">debug</a> &gt; <a href="index.source.html" class="el_package">com.example.cyclesync</a> &gt; <span class="el_source">InventoryActivity.java</span></div><h1>InventoryActivity.java</h1><pre class="source lang-java linenums">package com.example.cyclesync;
+
+import android.os.Bundle;
+import androidx.appcompat.app.AppCompatActivity;
+import android.util.Log;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.Toast;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.google.gson.Gson;
+import android.content.Intent;
+import android.widget.Button;
+
+import java.util.List;
+
+<span class="fc" id="L20">public class InventoryActivity extends AppCompatActivity {</span>
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+<span class="fc" id="L24">        super.onCreate(savedInstanceState);</span>
+<span class="fc" id="L25">        setContentView(R.layout.inventory_activity);</span>
+
+<span class="fc" id="L27">        User user = UserManager.getInstance().getUser();</span>
+<span class="fc" id="L28">        int id = user.getId();</span>
+
+<span class="fc" id="L30">        fetchInventory(id);</span>
+
+<span class="fc" id="L32">        ImageView backArrow = findViewById(R.id.back_arrow);</span>
+<span class="fc" id="L33">        backArrow.setOnClickListener(new View.OnClickListener() {</span>
+            @Override
+            public void onClick(View hgv) {
+<span class="nc" id="L36">                finish();</span>
+<span class="nc" id="L37">            }</span>
+        });
+
+<span class="fc" id="L40">        Button addBikeButton = findViewById(R.id.addBike);</span>
+<span class="fc" id="L41">        addBikeButton.setOnClickListener(new View.OnClickListener() {</span>
+            @Override
+            public void onClick(View v) {
+<span class="fc" id="L44">                Intent intent = new Intent(InventoryActivity.this, AddBikeActivity.class);</span>
+<span class="fc" id="L45">                startActivity(intent);</span>
+<span class="fc" id="L46">            }</span>
+        });
+<span class="fc" id="L48">    }</span>
+
+
+
+    private void fetchInventory(int id) {
+<span class="fc" id="L53">        String URL = &quot;http://10.0.2.2:8080/users/&quot; + id;</span>
+
+<span class="fc" id="L55">        StringRequest stringRequest = new StringRequest(</span>
+                Request.Method.GET,
+                URL,
+<span class="fc" id="L58">                new Response.Listener&lt;String&gt;() {</span>
+                    @Override
+                    public void onResponse(String response) {
+<span class="fc" id="L61">                        Log.d(&quot;Volley Response&quot;, response);</span>
+<span class="fc" id="L62">                        String resp = response.toString();</span>
+<span class="fc" id="L63">                        Gson gson = new Gson();</span>
+<span class="fc" id="L64">                        User user = gson.fromJson(response, User.class);</span>
+<span class="fc" id="L65">                        UserManager.getInstance().setUser(user);</span>
+<span class="fc" id="L66">                        List&lt;Bike&gt; bikes = user.getBikes();</span>
+
+<span class="fc" id="L68">                        LinearLayout parentLayout = findViewById(R.id.items_container);</span>
+<span class="fc bfc" id="L69" title="All 2 branches covered.">                        if (bikes.isEmpty()) {</span>
+<span class="fc" id="L70">                            Toast.makeText(InventoryActivity.this, &quot;No bikes available&quot;, Toast.LENGTH_SHORT).show();</span>
+                        }
+
+<span class="fc bfc" id="L73" title="All 2 branches covered.">                        for(Bike bike : bikes) {</span>
+                            // Inflate the InventoryItem layout
+<span class="fc" id="L75">                            InventoryItem itemView = new InventoryItem(InventoryActivity.this);</span>
+<span class="fc" id="L76">                            itemView.setText1(bike.getName());</span>
+<span class="fc" id="L77">                            itemView.updateInventoryItem(bike);</span>
+<span class="fc" id="L78">                            parentLayout.addView(itemView);</span>
+<span class="fc" id="L79">                        }</span>
+<span class="fc" id="L80">                    }</span>
+                },
+<span class="fc" id="L82">                new Response.ErrorListener() {</span>
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // Handle any errors that occur during the request
+<span class="nc" id="L86">                        Log.e(&quot;Volley Error&quot;, error.toString());</span>
+<span class="nc" id="L87">                    }</span>
+                }
+        );
+
+        // Adding request to request queue
+<span class="fc" id="L92">        VolleySingleton.getInstance(getApplicationContext()).addToRequestQueue(stringRequest);</span>
+<span class="fc" id="L93">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span>Generated by the Android Gradle plugin 8.1.1</div></body></html>

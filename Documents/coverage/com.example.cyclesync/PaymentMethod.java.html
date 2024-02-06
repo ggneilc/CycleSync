@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PaymentMethod.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=0;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">debug</a> &gt; <a href="index.source.html" class="el_package">com.example.cyclesync</a> &gt; <span class="el_source">PaymentMethod.java</span></div><h1>PaymentMethod.java</h1><pre class="source lang-java linenums">package com.example.cyclesync;
+
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class PaymentMethod {
+
+    // Enum to represent the different types of payment method
+<span class="fc" id="L10">    public enum PaymentType {</span>
+<span class="fc" id="L11">        CREDIT_CARD,</span>
+<span class="fc" id="L12">        PAYPAL,</span>
+<span class="fc" id="L13">        APPLE_PAY</span>
+    }
+
+    public int getId() {
+<span class="fc" id="L17">        return id;</span>
+    }
+
+    public void setId(int id) {
+<span class="nc" id="L21">        this.id = id;</span>
+<span class="nc" id="L22">    }</span>
+
+    private int id;
+
+    private PaymentType type;
+
+    private String cardHolderName;
+
+    public String getName() {
+<span class="fc" id="L31">        return name;</span>
+    }
+
+    public void setName(String name) {
+<span class="nc" id="L35">        this.name = name;</span>
+<span class="nc" id="L36">    }</span>
+
+    private String name;
+
+    private String cardNumber;
+
+    private String expiryDate; // Format &quot;MM/YY&quot;
+
+    private String cvv;
+
+<span class="fc" id="L46">    public PaymentMethod() {</span>
+        // Default constructor
+<span class="fc" id="L48">    }</span>
+
+<span class="fc" id="L50">    public PaymentMethod(PaymentType type, String cardHolderName, String name, String cardNumber, String expiryDate, String cvv) {</span>
+<span class="fc" id="L51">        this.type = type;</span>
+<span class="fc" id="L52">        this.cardHolderName = cardHolderName;</span>
+<span class="fc" id="L53">        this.name = name;</span>
+<span class="fc" id="L54">        this.cardNumber = cardNumber;</span>
+<span class="fc" id="L55">        this.expiryDate = expiryDate;</span>
+<span class="fc" id="L56">        this.cvv = cvv;</span>
+<span class="fc" id="L57">    }</span>
+
+    public PaymentType getType() {
+<span class="nc" id="L60">        return type;</span>
+    }
+
+    public void setType(PaymentType type) {
+<span class="nc" id="L64">        this.type = type;</span>
+<span class="nc" id="L65">    }</span>
+
+    public String getCardHolderName() {
+<span class="nc" id="L68">        return cardHolderName;</span>
+    }
+
+    public void setCardHolderName(String cardHolderName) {
+<span class="nc" id="L72">        this.cardHolderName = cardHolderName;</span>
+<span class="nc" id="L73">    }</span>
+
+    public String getCardNumber() {
+<span class="nc" id="L76">        return cardNumber;</span>
+    }
+
+    public void setCardNumber(String cardNumber) {
+<span class="nc" id="L80">        this.cardNumber = cardNumber;</span>
+<span class="nc" id="L81">    }</span>
+
+    public String getExpiryDate() {
+<span class="nc" id="L84">        return expiryDate;</span>
+    }
+
+    public void setExpiryDate(String expiryDate) {
+<span class="nc" id="L88">        this.expiryDate = expiryDate;</span>
+<span class="nc" id="L89">    }</span>
+
+    public String getCvv() {
+<span class="nc" id="L92">        return cvv;</span>
+    }
+
+    public void setCvv(String cvv) {
+<span class="nc" id="L96">        this.cvv = cvv;</span>
+<span class="nc" id="L97">    }</span>
+
+     public Map&lt;String, Object&gt; toMap() {
+<span class="fc" id="L100">         Map&lt;String, Object&gt; map = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L101">         map.put(&quot;name&quot;, name);</span>
+<span class="fc" id="L102">         map.put(&quot;cardHolderName&quot;, cardHolderName);</span>
+<span class="fc" id="L103">         map.put(&quot;cardNumber&quot;, cardNumber);</span>
+<span class="fc" id="L104">         map.put(&quot;expiryDate&quot;, expiryDate);</span>
+<span class="fc" id="L105">         map.put(&quot;cvv&quot;, cvv);</span>
+<span class="fc" id="L106">         return map;</span>
+     }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span>Generated by the Android Gradle plugin 8.1.1</div></body></html>

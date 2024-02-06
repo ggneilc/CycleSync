@@ -1,0 +1,185 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > GlobalBikeMap</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">cyclesync.Websockets</a>
+</div>
+
+<h1>Coverage Summary for Class: GlobalBikeMap (cyclesync.Websockets)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">GlobalBikeMap</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    28.6%
+  </span>
+  <span class="absValue">
+    (2/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    16.7%
+  </span>
+  <span class="absValue">
+    (3/18)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package cyclesync.Websockets;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.Hashtable;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;import javax.websocket.OnClose;
+&nbsp;import javax.websocket.OnError;
+&nbsp;import javax.websocket.OnMessage;
+&nbsp;import javax.websocket.OnOpen;
+&nbsp;import javax.websocket.Session;
+&nbsp;import javax.websocket.server.PathParam;
+&nbsp;import javax.websocket.server.ServerEndpoint;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;import org.springframework.stereotype.Component;
+&nbsp;
+&nbsp;/**
+&nbsp; * Represents a WebSocket chat server for handling real-time communication
+&nbsp; * between users. Each user connects to the server using their unique
+&nbsp; * username.
+&nbsp; *
+&nbsp; * Caleb: Had initial skeleton
+&nbsp; * Neil: Authored all code
+&nbsp; *
+&nbsp; */
+&nbsp;
+&nbsp;@ServerEndpoint(&quot;/rental-updates/{userId}&quot;)
+&nbsp;@Component
+<b class="fc">&nbsp;public class GlobalBikeMap {</b>
+<b class="fc">&nbsp;    private static Map &lt; Session, String &gt; sessionUsernameMap = new Hashtable &lt; &gt; ();</b>
+&nbsp;    // server side logger
+<b class="fc">&nbsp;    private final Logger logger = LoggerFactory.getLogger(GlobalBikeMap.class);</b>
+&nbsp;    @OnOpen
+&nbsp;    public void onOpen(Session session, @PathParam(&quot;userId&quot;) String user) throws IOException {
+&nbsp;
+&nbsp;        // server side log
+<b class="nc">&nbsp;        logger.info(&quot;[onOpen] from &quot; + user);</b>
+&nbsp;
+&nbsp;        // Handle the case of a duplicate username
+<b class="nc">&nbsp;        if (sessionUsernameMap.containsKey(user)) {</b>
+<b class="nc">&nbsp;            session.getBasicRemote().sendText(&quot;id already exists&quot;);</b>
+<b class="nc">&nbsp;            session.close();</b>
+&nbsp;        } else {
+&nbsp;            // map current session with username
+<b class="nc">&nbsp;            sessionUsernameMap.put(session, user);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @OnClose
+&nbsp;    public void onClose(Session session) throws IOException {
+&nbsp;        // get the username from session-username mapping
+<b class="nc">&nbsp;        String id = sessionUsernameMap.get(session);</b>
+&nbsp;        // server side log
+<b class="nc">&nbsp;        logger.info(&quot;[onClose] &quot; + id);</b>
+&nbsp;        // remove user from memory mappings
+<b class="nc">&nbsp;        sessionUsernameMap.remove(session);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @OnError
+&nbsp;    public void onError(Session session, Throwable throwable) {
+&nbsp;
+&nbsp;        // get the username from session-username mapping
+<b class="nc">&nbsp;        String username = sessionUsernameMap.get(session);</b>
+&nbsp;
+&nbsp;        // do error handling here
+<b class="nc">&nbsp;        logger.info(&quot;[onError]&quot; + username + &quot;: &quot; + throwable.getMessage());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    public void broadcast(String rentalJson) {
+<b class="nc">&nbsp;        sessionUsernameMap.forEach((session, username) -&gt; {</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                session.getBasicRemote().sendText(rentalJson);</b>
+<b class="nc">&nbsp;            } catch (IOException e) {</b>
+<b class="nc">&nbsp;                logger.info(&quot;[Broadcast Exception] &quot; + e.getMessage());</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;        });
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2023-12-07 18:44</div>
+</div>
+</body>
+</html>

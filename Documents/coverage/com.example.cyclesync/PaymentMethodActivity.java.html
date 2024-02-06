@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PaymentMethodActivity.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=0;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">debug</a> &gt; <a href="index.source.html" class="el_package">com.example.cyclesync</a> &gt; <span class="el_source">PaymentMethodActivity.java</span></div><h1>PaymentMethodActivity.java</h1><pre class="source lang-java linenums">package com.example.cyclesync;
+
+import android.os.Bundle;
+import androidx.appcompat.app.AppCompatActivity;
+import android.util.Log;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.widget.Toast;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
+
+import android.content.Intent;
+import android.widget.Button;
+
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+<span class="fc" id="L27">public class PaymentMethodActivity extends AppCompatActivity {</span>
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+<span class="fc" id="L31">        super.onCreate(savedInstanceState);</span>
+<span class="fc" id="L32">        setContentView(R.layout.payment_methods_activity);</span>
+
+<span class="fc" id="L34">        int id = UserManager.getInstance().getUser().getId();</span>
+
+<span class="fc" id="L36">        fetchPaymentMethods(id);</span>
+
+<span class="fc" id="L38">        ImageView backArrow = findViewById(R.id.back_arrow);</span>
+<span class="fc" id="L39">        backArrow.setOnClickListener(new View.OnClickListener() {</span>
+            @Override
+            public void onClick(View hgv) {
+<span class="nc" id="L42">                finish();</span>
+<span class="nc" id="L43">            }</span>
+        });
+
+<span class="fc" id="L46">        Button addPaymentMethod = findViewById(R.id.add_payment_method);</span>
+<span class="fc" id="L47">        addPaymentMethod.setOnClickListener(new View.OnClickListener() {</span>
+            @Override
+            public void onClick(View hgv) {
+<span class="fc" id="L50">                Intent intent = new Intent(PaymentMethodActivity.this, AddPaymentMethodActivity.class);</span>
+<span class="fc" id="L51">                startActivity(intent);</span>
+<span class="fc" id="L52">            }</span>
+        });
+<span class="fc" id="L54">    }</span>
+
+
+
+    private void fetchPaymentMethods(int id) {
+<span class="fc" id="L59">        String URL = &quot;http://10.0.2.2:8080/payment_methods/&quot; + id;</span>
+
+<span class="fc" id="L61">        Log.d(&quot;FETCH PAYMENT METHODS&quot;, &quot;fetching: &quot; + URL);</span>
+
+<span class="fc" id="L63">        StringRequest stringRequest = new StringRequest(</span>
+                Request.Method.GET,
+                URL,
+<span class="fc" id="L66">                new Response.Listener&lt;String&gt;() {</span>
+                    @Override
+                    public void onResponse(String response) {
+<span class="fc" id="L69">                        Log.d(&quot;Volley Response&quot;, response);</span>
+<span class="fc" id="L70">                        clearPaymentMethods();</span>
+<span class="fc" id="L71">                        String resp = response.toString();</span>
+<span class="fc" id="L72">                        GsonBuilder gsonBuilder = new GsonBuilder();</span>
+<span class="fc" id="L73">                        gsonBuilder.registerTypeAdapter(Date.class, new DateTypeAdapter());</span>
+<span class="fc" id="L74">                        Gson gson = gsonBuilder.create();</span>
+
+<span class="fc" id="L76">                        Type listType = new TypeToken&lt;ArrayList&lt;PaymentMethod&gt;&gt;(){}.getType();</span>
+<span class="fc" id="L77">                        List&lt;PaymentMethod&gt; paymentMethods = gson.fromJson(resp, listType);</span>
+
+                        // Update user object
+<span class="fc" id="L80">                        UserManager.getInstance().getUser().setPaymentMethods(paymentMethods);</span>
+
+<span class="fc" id="L82">                        LinearLayout parentLayout = findViewById(R.id.items_container);</span>
+<span class="fc bfc" id="L83" title="All 2 branches covered.">                        if (paymentMethods.isEmpty()) {</span>
+<span class="fc" id="L84">                            Toast.makeText(PaymentMethodActivity.this, &quot;No payment methods available&quot;, Toast.LENGTH_SHORT).show();</span>
+                        }
+
+<span class="fc bfc" id="L87" title="All 2 branches covered.">                        for(PaymentMethod paymentMethod : paymentMethods) {</span>
+<span class="fc" id="L88">                            Log.d(&quot;PAYMENT_METHODS&quot;, paymentMethod.getName());</span>
+<span class="fc" id="L89">                            addPaymentMethodToView(paymentMethod);</span>
+//                        }
+<span class="fc" id="L91">                        }</span>
+<span class="fc" id="L92">                    }</span>
+                },
+<span class="fc" id="L94">                new Response.ErrorListener() {</span>
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // Handle any errors that occur during the request
+<span class="nc" id="L98">                        Log.e(&quot;Volley Error&quot;, error.toString());</span>
+<span class="nc" id="L99">                    }</span>
+                }
+        );
+
+        // Adding request to request queue
+<span class="fc" id="L104">        VolleySingleton.getInstance(getApplicationContext()).addToRequestQueue(stringRequest);</span>
+<span class="fc" id="L105">    }</span>
+
+    private void clearPaymentMethods() {
+<span class="fc" id="L108">        LinearLayout itemsContainer = findViewById(R.id.items_container);</span>
+<span class="fc" id="L109">        itemsContainer.removeAllViews();</span>
+<span class="fc" id="L110">    }</span>
+
+    @Override
+    protected void onResume() {
+<span class="fc" id="L114">        super.onResume();</span>
+<span class="fc" id="L115">        fetchPaymentMethods(UserManager.getInstance().getUser().getId());</span>
+<span class="fc" id="L116">    }</span>
+
+    // Helper method to add a payment method to the LinearLayout container
+    private void addPaymentMethodToView(PaymentMethod paymentMethod) {
+<span class="fc" id="L120">        LinearLayout parentLayout = findViewById(R.id.items_container);</span>
+
+        // Create a new view for the payment method
+<span class="fc" id="L123">        View paymentMethodView = getLayoutInflater().inflate(R.layout.payment_method_item, parentLayout, false);</span>
+
+        // Update the payment method details
+<span class="fc" id="L126">        TextView methodName = paymentMethodView.findViewById(R.id.method_name); // Replace with actual ID</span>
+<span class="fc" id="L127">        methodName.setText(paymentMethod.getName());</span>
+
+        // Possibly you will have icons for different payment methods (e.g., credit card, PayPal)
+<span class="fc" id="L130">        ImageView methodIcon = paymentMethodView.findViewById(R.id.method_icon); // Replace with actual ID</span>
+        // Set the correct icon depending on the type of payment method
+//        methodIcon.setImageResource(getPaymentMethodIcon(paymentMethod.getType()));
+
+        // Add onClickListener if you want to handle item clicks
+<span class="fc" id="L135">        paymentMethodView.setOnClickListener(new View.OnClickListener() {</span>
+            @Override
+            public void onClick(View v) {
+                // Handle the click event to view details
+<span class="nc" id="L139">            }</span>
+        });
+
+//        // Add divider before adding the payment method view, if not the first item
+//        if (parentLayout.getChildCount() &gt; 0) {
+//            View divider = new View(this);
+//            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 1);
+//            layoutParams.setMargins(0, 16, 0, 16); // Set top and bottom margins for the divider
+//            divider.setLayoutParams(layoutParams);
+//            divider.setBackgroundColor(getResources().getColor(android.R.color.darker_gray)); // Set the divider color
+//            parentLayout.addView(divider);
+//        }
+
+        // Finally, add the payment method view to the layout
+<span class="fc" id="L153">        parentLayout.addView(paymentMethodView);</span>
+<span class="fc" id="L154">    }</span>
+
+    // Dummy method, replace with your logic to determine the correct icon
+//    private int getPaymentMethodIcon(String type) {
+//        // TODO: Replace with logic to return different icons for different payment types
+//        int drawableId;
+//        switch (type) {
+//            case &quot;credit_card&quot;:
+//                drawableId = R.drawable.ic_credit_card; // Replace with your credit card icon drawable
+//                break;
+//            case &quot;paypal&quot;:
+//                drawableId = R.drawable.ic_paypal; // Replace with your PayPal icon drawable
+//                break;
+//            default:
+//                drawableId = R.drawable.ic_generic_payment; // Replace with your generic payment icon drawable
+//        }
+//        return drawableId;
+//    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span>Generated by the Android Gradle plugin 8.1.1</div></body></html>

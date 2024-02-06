@@ -1,0 +1,228 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > Main</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">cyclesync</a>
+</div>
+
+<h1>Coverage Summary for Class: Main (cyclesync)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Main</td>
+<td class="coverageStat">
+  <span class="percent">
+    80%
+  </span>
+  <span class="absValue">
+    (4/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    88.9%
+  </span>
+  <span class="absValue">
+    (8/9)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">Main$$EnhancerBySpringCGLIB$$1cbcd6e8</td>
+  </tr>
+  <tr>
+    <td class="name">Main$$EnhancerBySpringCGLIB$$1cbcd6e8$$FastClassBySpringCGLIB$$7838d2ab</td>
+  </tr>
+  <tr>
+    <td class="name">Main$$FastClassBySpringCGLIB$$5a910b26</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    80%
+  </span>
+  <span class="absValue">
+    (4/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    88.9%
+  </span>
+  <span class="absValue">
+    (8/9)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package cyclesync;
+&nbsp;
+&nbsp;/**
+&nbsp; * Caleb: Wrote all code relating to initial springboot setup
+&nbsp; * Neil: Added Swagger-ui bean and dependencies
+&nbsp; */
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;import java.util.Date;
+&nbsp;
+&nbsp;import org.springframework.boot.CommandLineRunner;
+&nbsp;import org.springframework.boot.SpringApplication;
+&nbsp;import org.springframework.boot.autoconfigure.SpringBootApplication;
+&nbsp;import org.springframework.context.annotation.Bean;
+&nbsp;
+&nbsp;import cyclesync.Rentals.Rental;
+&nbsp;import cyclesync.Rentals.RentalRepository;
+&nbsp;import cyclesync.Bikes.Bike;
+&nbsp;import cyclesync.Bikes.BikeRepository;
+&nbsp;import cyclesync.Users.User;
+&nbsp;import cyclesync.Users.UserRepository;
+&nbsp;//import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+&nbsp;import springfox.documentation.swagger2.annotations.EnableSwagger2;
+&nbsp;import springfox.documentation.builders.PathSelectors;
+&nbsp;import springfox.documentation.builders.RequestHandlerSelectors;
+&nbsp;import springfox.documentation.spi.DocumentationType;
+&nbsp;import springfox.documentation.spring.web.plugins.Docket;
+&nbsp;
+&nbsp;@SpringBootApplication
+&nbsp;@EnableSwagger2
+&nbsp;//@EnableJpaRepositories
+<b class="fc">&nbsp;class Main {</b>
+&nbsp;
+&nbsp;    public static void main(String[] args) {
+<b class="nc">&nbsp;        SpringApplication.run(Main.class, args);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // Create 3 users with their Bikes and Rentals
+&nbsp;    @Bean
+&nbsp;    CommandLineRunner initUser(UserRepository userRepository, RentalRepository rentalRepository, BikeRepository bikeRepository) {
+<b class="fc">&nbsp;        return args -&gt; {</b>
+&nbsp;//        rentalRepository.deleteAll();
+&nbsp;//        userRepository.deleteAll();
+&nbsp;//        bikeRepository.deleteAll();
+&nbsp;//
+&nbsp;//        User u = new User(&quot;thomas&quot;, &quot;payton&quot;, &quot;tp&quot;, &quot;tp&quot;);
+&nbsp;//        Bike b = new Bike(u,&quot;3/5&quot;,&quot;Samsung&quot;, true, &quot;2811 West St, Ames&quot;, 3,42.025576666666666,-93.65638666666666,true);
+&nbsp;//        u.addBike(b);
+&nbsp;//        userRepository.save(u);
+&nbsp;//        bikeRepository.save(b);
+&nbsp;
+&nbsp;            /*
+&nbsp;          User user1 = new User(&quot;Neil&quot;, &quot;Choromokos&quot;, &quot;nchurro@mail.com&quot;, &quot;password1&quot;);
+&nbsp;          User user2 = new User(&quot;Thomas&quot;, &quot;Payton&quot;, &quot;tpayton@mail.com&quot;, &quot;testpass1&quot;);
+&nbsp;          Rental rental1 = new Rental(user1, 20);
+&nbsp;          Rental rental2 = new Rental(user1, 30);
+&nbsp;          Rental rental3 = new Rental(user2, 15);
+&nbsp;          bikeRepository.save(new Bike(user1, &quot;Gray&quot;, &quot;Skootr 2&quot;));
+&nbsp;          bikeRepository.save(new Bike(user1, &quot;Black&quot;, &quot;Skootr 5&quot;));
+&nbsp;          userRepository.save(user1);
+&nbsp;          userRepository.save(user2);
+&nbsp;          */
+&nbsp;
+&nbsp;            /*
+&nbsp;            User user1 = new User(&quot;Neil&quot;, &quot;nchurror&quot;, &quot;test&quot;, &quot;nchurro@somemail.com&quot;);
+&nbsp;            User user2 = new User(&quot;Caleb&quot;, &quot;lemmon&quot;, &quot;test&quot;, &quot;clemmons@somemail.com&quot;);
+&nbsp;            User user3 = new User(&quot;Thomas&quot;, &quot;tpayton&quot;, &quot;test&quot;, &quot;tpayton@somemail.com&quot;);
+&nbsp;            Rental r1 = new Rental( &quot;Current&quot;, 15, new Date());
+&nbsp;            Rental r2 = new Rental( &quot;Past&quot;, 18, new Date());
+&nbsp;            Rental r3 = new Rental( &quot;Upcoming&quot;, 0, new Date());
+&nbsp;
+&nbsp;            bikeRepository.save(ne Bike(&quot;Tesla&quot;, &quot;New&quot;, &quot;Gray&quot;, &quot;Skootr 2&quot;, 99 ));
+&nbsp;            bikeRepository.save(new Bike(&quot;Tesla&quot;, &quot;Used&quot;, &quot;White&quot;, &quot;Skootr&quot;, 50 ));
+&nbsp;            bikeRepository.save(new Bike(&quot;Razer&quot;, &quot;New&quot;, &quot;Green&quot;, &quot;Cool Bike name&quot;, 99 ));
+&nbsp;            bikeRepository.save(new Bike(&quot;Razer&quot;, &quot;Battered&quot;, &quot;Black&quot;, &quot;terrain destroyer&quot;, 99 ));
+&nbsp;            bikeRepository.save(new Bike(&quot;Mountaineer&quot;, &quot;Old&quot;, &quot;Blue&quot;, &quot;swag bike&quot;, 99 ));
+&nbsp;            bikeRepository.save(new Bike(&quot;Mountaineer&quot;, &quot;Worn&quot;, &quot;Purple&quot;, &quot;bicyle&quot;, 99 ));
+&nbsp;            bikeRepository.save(new Bike(&quot;HotWheels&quot;, &quot;New&quot;, &quot;Yellow&quot;, &quot;epic bicyle&quot;, 99 ));
+&nbsp;
+&nbsp;            user1.setRental(r1);
+&nbsp;            user2.setRental(r2);
+&nbsp;            user3.setRental(r3);
+&nbsp;            user1.addBikes(bikeRepository.findById(1));
+&nbsp;            user1.addBikes(bikeRepository.findById(2));
+&nbsp;            user1.addBikes(bikeRepository.findById(6));
+&nbsp;            user2.addBikes(bikeRepository.findById(3));
+&nbsp;            user2.addBikes(bikeRepository.findById(4));
+&nbsp;            user3.addBikes(bikeRepository.findById(5));
+&nbsp;            user3.addBikes(bikeRepository.findById(7));
+&nbsp;            userRepository.save(user1);
+&nbsp;            userRepository.save(user2);
+&nbsp;            userRepository.save(user3);*/
+&nbsp;
+<b class="fc">&nbsp;        };</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Bean
+&nbsp;    public Docket getAPIdocs() {
+<b class="fc">&nbsp;        return new Docket(DocumentationType.SWAGGER_2)</b>
+<b class="fc">&nbsp;                .select()</b>
+<b class="fc">&nbsp;                .apis(RequestHandlerSelectors.any())</b>
+<b class="fc">&nbsp;                .paths(PathSelectors.any())</b>
+<b class="fc">&nbsp;                .build();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2023-12-07 18:44</div>
+</div>
+</body>
+</html>

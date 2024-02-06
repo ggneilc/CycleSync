@@ -1,0 +1,66 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp">
+
+        <ImageView
+            android:id="@+id/back_arrow_very_unique"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/back_arrow"
+            android:layout_alignParentStart="true" />
+
+        <TextView
+            android:id="@+id/review_prompt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="How was the bike?"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:layout_below="@+id/back_arrow_very_unique"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="16dp" />
+
+        <RatingBar
+            android:id="@+id/ratingBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:numStars="5"
+            android:rating="0"
+            android:layout_below="@+id/review_prompt"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="16dp" />
+
+        <EditText
+            android:id="@+id/review_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="15dp"
+            android:hint="Write your review here..."
+            android:layout_below="@+id/ratingBar"
+            android:background="@drawable/grey_rounded_background_15"
+            android:layout_marginTop="32dp" />
+
+        <Button
+            android:id="@+id/submit_review"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/GreenButton"
+            android:background="@drawable/green_button_rounded"
+            android:text="Submit"
+            android:fontFamily="@font/poppins_semibold"
+            android:stateListAnimator="@null"
+            android:textAllCaps="false"
+            android:textColor="#FFFFFF"
+            android:paddingVertical="10dp"
+            android:paddingHorizontal="15dp"
+            android:layout_below="@+id/review_text"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="32dp" />
+
+    </RelativeLayout>
+
+</ScrollView>

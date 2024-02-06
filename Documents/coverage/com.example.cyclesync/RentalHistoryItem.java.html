@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RentalHistoryItem.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=0;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">debug</a> &gt; <a href="index.source.html" class="el_package">com.example.cyclesync</a> &gt; <span class="el_source">RentalHistoryItem.java</span></div><h1>RentalHistoryItem.java</h1><pre class="source lang-java linenums">package com.example.cyclesync;
+
+import android.content.Context;
+import android.graphics.drawable.Drawable;
+import android.util.AttributeSet;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+import net.cachapa.expandablelayout.ExpandableLayout;
+import android.util.Log;
+import android.content.res.TypedArray;
+import android.widget.Button;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+import android.widget.Toast;
+import android.content.Intent;
+
+import java.text.SimpleDateFormat;
+
+public class RentalHistoryItem extends RelativeLayout {
+    private ExpandableLayout expandableLayout;
+    private ImageView rentalIcon;
+    private ImageView arrow;
+    private TextView rentalHistoryText1;
+    private TextView renter_value;
+    private TextView locationValue;
+    private TextView ratingValue;
+
+    private TextView reviewValue;
+
+    public RentalHistoryItem(Context context) {
+<span class="fc" id="L37">        super(context);</span>
+<span class="fc" id="L38">        init(null);</span>
+<span class="fc" id="L39">    }</span>
+
+    public RentalHistoryItem(Context context, AttributeSet attrs) {
+<span class="nc" id="L42">        super(context, attrs);</span>
+<span class="nc" id="L43">        init(attrs);</span>
+<span class="nc" id="L44">    }</span>
+
+    private void init(AttributeSet attrs) {
+<span class="fc" id="L47">        LayoutInflater.from(getContext()).inflate(R.layout.rental_history_item, this, true);</span>
+
+<span class="fc" id="L49">        rentalIcon = findViewById(R.id.rentalIcon);</span>
+<span class="fc" id="L50">        rentalHistoryText1 = findViewById(R.id.rentalHistoryText1);</span>
+<span class="fc" id="L51">        arrow = findViewById(R.id.arrow);</span>
+<span class="fc" id="L52">        expandableLayout = findViewById(R.id.expandableLayout);</span>
+<span class="fc" id="L53">        renter_value = findViewById(R.id.renter_value);</span>
+<span class="fc" id="L54">        locationValue = findViewById(R.id.location_value);</span>
+<span class="fc" id="L55">        ratingValue = findViewById(R.id.rating_value);</span>
+<span class="fc" id="L56">        reviewValue = findViewById(R.id.review_value);</span>
+
+<span class="fc" id="L58">        RelativeLayout rentalHistoryItemLayout = findViewById(R.id.rentalHistoryItemLayout);</span>
+<span class="fc" id="L59">        rentalHistoryItemLayout.setOnClickListener(new OnClickListener() {</span>
+            @Override
+            public void onClick(View v) {
+<span class="fc" id="L62">                Log.d(&quot;RentalHistoryItemClick&quot;, &quot;Layout Clicked!&quot;);</span>
+<span class="pc bpc" id="L63" title="1 of 2 branches missed.">                if (expandableLayout.isExpanded()) {</span>
+<span class="nc" id="L64">                    expandableLayout.collapse();</span>
+<span class="nc" id="L65">                    arrow.animate().rotation(0).setDuration(300).start();</span>
+                } else {
+<span class="fc" id="L67">                    expandableLayout.expand();</span>
+<span class="fc" id="L68">                    arrow.animate().rotation(180).setDuration(300).start();</span>
+                }
+<span class="fc" id="L70">            }</span>
+        });
+
+<span class="pc bpc" id="L73" title="1 of 2 branches missed.">        if (attrs != null) {</span>
+<span class="nc" id="L74">            TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.InventoryItem, 0, 0);</span>
+<span class="nc" id="L75">            Drawable icon = a.getDrawable(R.styleable.InventoryItem_inventoryIcon);</span>
+<span class="nc" id="L76">            String text1 = a.getString(R.styleable.InventoryItem_inventoryText1);</span>
+
+<span class="nc bnc" id="L78" title="All 2 branches missed.">            if (icon != null) {</span>
+<span class="nc" id="L79">                rentalIcon.setImageDrawable(icon);</span>
+            }
+<span class="nc bnc" id="L81" title="All 2 branches missed.">            if (text1 != null) {</span>
+<span class="nc" id="L82">                rentalHistoryText1.setText(text1);</span>
+            }
+<span class="nc" id="L84">            a.recycle();</span>
+        }
+<span class="fc" id="L86">    }</span>
+
+    public void setIcon(Drawable icon) {
+<span class="nc" id="L89">        rentalIcon.setImageDrawable(icon);</span>
+<span class="nc" id="L90">    }</span>
+
+    public void setText1(String text) {
+<span class="nc" id="L93">        rentalHistoryText1.setText(text);</span>
+<span class="nc" id="L94">    }</span>
+
+    public void updateRentalItem(RentalPreview rental) {
+<span class="pc bpc" id="L97" title="1 of 2 branches missed.">        if (rental.isElectric()) {</span>
+<span class="nc" id="L98">            rentalIcon.setImageResource(R.drawable.electric_icon);</span>
+        } else {
+<span class="fc" id="L100">            rentalIcon.setImageResource(R.drawable.become_renter_setting);</span>
+        }
+<span class="fc" id="L102">        rentalHistoryText1.setText(rental.getBike_name());</span>
+//        rentalHistoryText1.setText(new SimpleDateFormat(&quot;MM-dd-yy&quot;).format(rental.getStart_date()) + &quot;-&quot; + new SimpleDateFormat(&quot;MM-dd-yy&quot;).format(rental.getStop_date()));
+<span class="fc" id="L104">        renter_value.setText(rental.getRenter_name());</span>
+<span class="fc" id="L105">        locationValue.setText(rental.getLocation());</span>
+<span class="fc" id="L106">        ratingValue.setText(rental.getRating());</span>
+<span class="fc" id="L107">        reviewValue.setText(rental.getReview());</span>
+<span class="fc" id="L108">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span>Generated by the Android Gradle plugin 8.1.1</div></body></html>

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CustomComponent.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=0;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">debug</a> &gt; <a href="index.source.html" class="el_package">com.example.cyclesync</a> &gt; <span class="el_source">CustomComponent.java</span></div><h1>CustomComponent.java</h1><pre class="source lang-java linenums">package com.example.cyclesync;
+
+import android.content.Context;
+import android.content.res.TypedArray;
+import android.graphics.drawable.Drawable;
+import android.util.AttributeSet;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+
+public class CustomComponent extends RelativeLayout {
+
+    private ImageView speakerIcon;
+    private TextView notificationsText;
+    private OnComponentClickListener onComponentClickListener;
+
+    public CustomComponent(Context context) {
+<span class="nc" id="L20">        super(context);</span>
+<span class="nc" id="L21">        init(context, null);</span>
+<span class="nc" id="L22">    }</span>
+
+    public CustomComponent(Context context, AttributeSet attrs) {
+<span class="fc" id="L25">        super(context, attrs);</span>
+<span class="fc" id="L26">        init(context, attrs);</span>
+<span class="fc" id="L27">    }</span>
+
+    public CustomComponent(Context context, AttributeSet attrs, int defStyleAttr) {
+<span class="nc" id="L30">        super(context, attrs, defStyleAttr);</span>
+<span class="nc" id="L31">        init(context, attrs);</span>
+<span class="nc" id="L32">    }</span>
+
+    private void init(Context context, AttributeSet attrs) {
+<span class="fc" id="L35">        LayoutInflater.from(context).inflate(R.layout.setting_item, this, true);</span>
+<span class="fc" id="L36">        speakerIcon = findViewById(R.id.speaker_icon);</span>
+<span class="fc" id="L37">        notificationsText = findViewById(R.id.notifications_text);</span>
+
+<span class="pc bpc" id="L39" title="1 of 2 branches missed.">        if (attrs != null) {</span>
+<span class="fc" id="L40">            TypedArray attributes = context.obtainStyledAttributes(attrs, R.styleable.CustomComponent);</span>
+<span class="fc" id="L41">            Drawable icon = attributes.getDrawable(R.styleable.CustomComponent_speakerIcon);</span>
+<span class="fc" id="L42">            String text = attributes.getString(R.styleable.CustomComponent_notificationsText);</span>
+
+<span class="pc bpc" id="L44" title="1 of 2 branches missed.">            if (icon != null) {</span>
+<span class="fc" id="L45">                speakerIcon.setImageDrawable(icon);</span>
+            }
+
+<span class="pc bpc" id="L48" title="1 of 2 branches missed.">            if (text != null) {</span>
+<span class="fc" id="L49">                notificationsText.setText(text);</span>
+            }
+
+<span class="fc" id="L52">            attributes.recycle();</span>
+        }
+
+<span class="fc" id="L55">        this.setOnClickListener(new OnClickListener() {</span>
+            @Override
+            public void onClick(View view) {
+<span class="pc bpc" id="L58" title="1 of 2 branches missed.">                if (onComponentClickListener != null) {</span>
+<span class="fc" id="L59">                    onComponentClickListener.onComponentClick(view);</span>
+                }
+<span class="fc" id="L61">            }</span>
+        });
+<span class="fc" id="L63">    }</span>
+
+    public void setOnComponentClickListener(OnComponentClickListener listener) {
+<span class="fc" id="L66">        this.onComponentClickListener = listener;</span>
+<span class="fc" id="L67">    }</span>
+
+    public void setSpeakerIcon(Drawable drawable) {
+<span class="nc" id="L70">        speakerIcon.setImageDrawable(drawable);</span>
+<span class="nc" id="L71">    }</span>
+
+    public void setNotificationsText(String text) {
+<span class="nc" id="L74">        notificationsText.setText(text);</span>
+<span class="nc" id="L75">    }</span>
+
+    public interface OnComponentClickListener {
+        void onComponentClick(View view);
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span>Generated by the Android Gradle plugin 8.1.1</div></body></html>

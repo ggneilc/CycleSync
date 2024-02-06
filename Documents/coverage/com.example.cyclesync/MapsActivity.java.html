@@ -1,0 +1,685 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MapsActivity.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=0;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">debug</a> &gt; <a href="index.source.html" class="el_package">com.example.cyclesync</a> &gt; <span class="el_source">MapsActivity.java</span></div><h1>MapsActivity.java</h1><pre class="source lang-java linenums">package com.example.cyclesync;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.location.Location;
+import android.os.Bundle;
+
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.RelativeLayout;
+import android.widget.Switch;
+import android.widget.TextView;
+import android.widget.Toast;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+
+import org.java_websocket.handshake.ServerHandshake;
+import org.json.JSONObject;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import org.json.JSONArray;
+import com.android.volley.toolbox.JsonArrayRequest;
+import org.json.JSONException;
+
+
+import com.android.volley.toolbox.StringRequest;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MapStyleOptions;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+
+import net.cachapa.expandablelayout.ExpandableLayout;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+<span class="fc" id="L59">public class MapsActivity extends AppCompatActivity</span>
+        implements OnMapReadyCallback, WebSocketListener {
+
+    private GoogleMap map;
+    private CameraPosition cameraPosition;
+<span class="fc" id="L64">    private boolean isLayoutExpanded = false;</span>
+
+
+    // The entry point to the Fused Location Provider.
+    private FusedLocationProviderClient fusedLocationProviderClient;
+
+    // A default location (Sydney, Australia) and default zoom to use when location permission is
+    // not granted.
+<span class="fc" id="L72">    private final LatLng defaultLocation = new LatLng(-33.8523341, 151.2106085);</span>
+    private static final int DEFAULT_ZOOM = 15;
+    private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
+    private boolean locationPermissionGranted;
+
+    // The geographical location where the device is currently located. That is, the last-known
+    // location retrieved by the Fused Location Provider.
+    private Location lastKnownLocation;
+
+    // Keys for storing activity state.
+    private static final String KEY_CAMERA_POSITION = &quot;camera_position&quot;;
+    private static final String KEY_LOCATION = &quot;location&quot;;
+
+<span class="fc" id="L85">    private static final String TAG = MapsActivity.class.getSimpleName();</span>
+
+    private Marker focusedMarker;
+
+<span class="fc" id="L89">    private List&lt;BikeMarker&gt; bikeMarkers = new ArrayList&lt;&gt;();</span>
+
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+<span class="fc" id="L94">        super.onCreate(savedInstanceState);</span>
+
+        // Retrieve location and camera position from saved instance state.
+<span class="pc bpc" id="L97" title="1 of 2 branches missed.">        if (savedInstanceState != null) {</span>
+<span class="nc" id="L98">            lastKnownLocation = savedInstanceState.getParcelable(KEY_LOCATION);</span>
+<span class="nc" id="L99">            cameraPosition = savedInstanceState.getParcelable(KEY_CAMERA_POSITION);</span>
+        }
+
+
+
+        // Retrieve the content view that renders the map.
+<span class="fc" id="L105">        setContentView(R.layout.maps_activity);</span>
+
+<span class="fc" id="L107">        User user = UserManager.getInstance().getUser();</span>
+<span class="fc" id="L108">        Log.d(&quot;user on maps&quot;, user.toString());</span>
+<span class="fc" id="L109">        String welcomeText = &quot;Welcome &quot; + UserManager.getInstance().getUser().getName() + &quot;!&quot;;</span>
+<span class="fc" id="L110">        Toast.makeText(MapsActivity.this, welcomeText, Toast.LENGTH_SHORT).show();</span>
+
+<span class="fc" id="L112">        FrameLayout settingsImageView = findViewById(R.id.settings);</span>
+<span class="fc" id="L113">        settingsImageView.setOnClickListener(new View.OnClickListener() {</span>
+            @Override
+            public void onClick(View v) {
+                Intent intent;
+<span class="pc bpc" id="L117" title="1 of 2 branches missed.">                if (user.getIsRenter()) {</span>
+<span class="nc" id="L118">                    intent = new Intent(MapsActivity.this, RenterSettingsActivity.class);</span>
+                } else {
+<span class="fc" id="L120">                    intent = new Intent(MapsActivity.this, SettingsActivity.class);</span>
+                }
+<span class="fc" id="L122">                startActivity(intent);</span>
+<span class="fc" id="L123">            }</span>
+        });
+
+<span class="fc" id="L126">        FrameLayout messageRenter = findViewById(R.id.message_renter);</span>
+<span class="fc" id="L127">        messageRenter.setOnClickListener(new View.OnClickListener() {</span>
+            @Override
+            public void onClick(View v) {
+                Intent intent;
+<span class="fc" id="L131">                Rental currentRental = UserManager.getInstance().getUser().getCurrent_rental();</span>
+<span class="pc bpc" id="L132" title="1 of 2 branches missed.">                if (currentRental != null) {</span>
+<span class="fc" id="L133">                    intent = new Intent(MapsActivity.this, MessageActivity.class);</span>
+<span class="fc" id="L134">                    startActivity(intent);</span>
+                } else {
+<span class="nc" id="L136">                    Toast.makeText(MapsActivity.this, &quot;You don't have an active rental!&quot;, Toast.LENGTH_SHORT).show();</span>
+                }
+<span class="fc" id="L138">            }</span>
+        });
+
+<span class="fc" id="L141">        Button buttonLogin = findViewById(R.id.buttonRentNow);</span>
+<span class="fc" id="L142">        buttonLogin.setOnClickListener(v -&gt; {</span>
+<span class="fc" id="L143">            Bike currentBike = BikeManager.getInstance().getBike();</span>
+<span class="fc" id="L144">            Rental currentRental = UserManager.getInstance().getUser().getCurrent_rental();</span>
+
+<span class="fc bfc" id="L146" title="All 2 branches covered.">            if (currentRental != null) {</span>
+<span class="fc" id="L147">                makeRentalStopReq();</span>
+<span class="pc bpc" id="L148" title="1 of 2 branches missed.">            } else if(currentBike == null) {</span>
+<span class="nc" id="L149">                Toast.makeText(MapsActivity.this, &quot;Please select a bike&quot;, Toast.LENGTH_SHORT).show();</span>
+            } else {
+<span class="fc" id="L151">                Intent intent = new Intent(MapsActivity.this, RentNowActivity.class);</span>
+<span class="fc" id="L152">                startActivity(intent);</span>
+            }
+<span class="fc" id="L154">        });</span>
+
+        // Construct a FusedLocationProviderClient.
+<span class="fc" id="L157">        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);</span>
+
+        // Build the map.
+<span class="fc" id="L160">        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()</span>
+<span class="fc" id="L161">                .findFragmentById(R.id.map);</span>
+<span class="fc" id="L162">        mapFragment.getMapAsync(this);</span>
+
+
+<span class="fc" id="L165">        String serverUrl = &quot;ws://10.0.2.2:8080/rental-updates/&quot; + UserManager.getInstance().getUser().getId();</span>
+<span class="fc" id="L166">        Log.d(&quot;MapsActivity&quot;, &quot;Initializing WS @ &quot; + serverUrl);</span>
+
+<span class="fc" id="L168">        WebSocketManager.getInstance().connectWebSocket(serverUrl);</span>
+<span class="fc" id="L169">        WebSocketManager.getInstance().setWebSocketListener(MapsActivity.this);</span>
+
+
+<span class="fc" id="L172">        RelativeLayout filterLayout = findViewById(R.id.filterLayout);</span>
+<span class="fc" id="L173">        ImageView arrow = findViewById(R.id.arrow); // Ensure you have this ImageView in your layout</span>
+<span class="fc" id="L174">        ExpandableLayout expandableLayout = findViewById(R.id.expandableLayout);</span>
+
+<span class="fc" id="L176">        filterLayout.setOnClickListener(new View.OnClickListener() {</span>
+            @Override
+            public void onClick(View v) {
+<span class="nc" id="L179">                toggleExpandableLayout(expandableLayout, arrow);</span>
+<span class="nc" id="L180">            }</span>
+        });
+
+<span class="fc" id="L183">        Button applyButton = findViewById(R.id.button);</span>
+<span class="fc" id="L184">        applyButton.setOnClickListener(new View.OnClickListener() {</span>
+            @Override
+            public void onClick(View v) {
+                try {
+<span class="nc" id="L188">                    int priceMin = Integer.parseInt(((EditText) findViewById(R.id.priceMin)).getText().toString());</span>
+<span class="nc" id="L189">                    int priceMax = Integer.parseInt(((EditText) findViewById(R.id.priceMax)).getText().toString());</span>
+<span class="nc" id="L190">                    boolean filterClassic = ((Switch) findViewById(R.id.classic)).isChecked();</span>
+<span class="nc" id="L191">                    boolean filterElectric = ((Switch) findViewById(R.id.electric)).isChecked();</span>
+
+<span class="nc bnc" id="L193" title="All 2 branches missed.">                    if (priceMin &gt; priceMax) {</span>
+<span class="nc" id="L194">                        Toast.makeText(MapsActivity.this, &quot;Minimum price cannot be greater than maximum price.&quot;, Toast.LENGTH_SHORT).show();</span>
+<span class="nc" id="L195">                        return;</span>
+                    }
+
+<span class="nc" id="L198">                    filterBikes(priceMin, priceMax, filterClassic, filterElectric);</span>
+<span class="nc" id="L199">                } catch (NumberFormatException e) {</span>
+<span class="nc" id="L200">                    Toast.makeText(MapsActivity.this, &quot;Please enter valid prices.&quot;, Toast.LENGTH_SHORT).show();</span>
+<span class="nc" id="L201">                }</span>
+<span class="nc" id="L202">            }</span>
+        });
+
+<span class="fc" id="L205">    }</span>
+
+    private void toggleExpandableLayout(ExpandableLayout expandableLayout, ImageView arrow) {
+<span class="nc bnc" id="L208" title="All 2 branches missed.">        if (isLayoutExpanded) {</span>
+<span class="nc" id="L209">            expandableLayout.collapse();</span>
+<span class="nc" id="L210">            arrow.setRotation(0); // Arrow points down</span>
+        } else {
+<span class="nc" id="L212">            expandableLayout.expand();</span>
+<span class="nc" id="L213">            arrow.setRotation(180); // Arrow points up</span>
+        }
+<span class="nc bnc" id="L215" title="All 2 branches missed.">        isLayoutExpanded = !isLayoutExpanded; // Toggle the state</span>
+<span class="nc" id="L216">    }</span>
+
+    @Override
+    protected void onResume() {
+<span class="fc" id="L220">        super.onResume();</span>
+<span class="fc bfc" id="L221" title="All 2 branches covered.">        if (map == null) {</span>
+<span class="fc" id="L222">            return;</span>
+        }
+<span class="fc" id="L224">        map.clear();</span>
+<span class="fc" id="L225">        this.bikeMarkers = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L226">        fetchBikeLocationFromBackend();</span>
+<span class="fc" id="L227">        Button rentNowButton = findViewById(R.id.buttonRentNow);</span>
+<span class="fc" id="L228">        rentNowButton.setText(&quot;Rent Now&quot;);</span>
+<span class="fc" id="L229">        rentNowButton.setBackgroundResource(R.drawable.green_button_rounded);</span>
+<span class="fc" id="L230">        fetchCurrentRental();</span>
+<span class="fc" id="L231">    }</span>
+
+    private void fetchBikeLocationFromBackend() {
+<span class="fc" id="L234">        Log.d(&quot;made it into top&quot;, &quot;got&quot;);</span>
+<span class="fc" id="L235">        String URL = &quot;http://10.0.2.2:8080/bikes&quot;;</span>
+
+<span class="fc" id="L237">        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, URL, null,</span>
+<span class="fc" id="L238">                new Response.Listener&lt;JSONArray&gt;() {</span>
+                    @Override
+                    public void onResponse(JSONArray response) {
+                        try {
+<span class="fc" id="L242">                            List&lt;Bike&gt; bikes = parseBikes(response);</span>
+
+<span class="fc bfc" id="L244" title="All 2 branches covered.">                            for (Bike bike : bikes) {</span>
+<span class="fc bfc" id="L245" title="All 2 branches covered.">                                if (!bike.getonMarket()) {</span>
+<span class="fc" id="L246">                                    continue;</span>
+                                }
+<span class="fc" id="L248">                                double lat = bike.getLatitude();</span>
+<span class="fc" id="L249">                                double lng = bike.getLongitude();</span>
+<span class="fc" id="L250">                                int price = bike.getPrice();</span>
+
+<span class="fc" id="L252">                                Marker bikeMarker = map.addMarker(new MarkerOptions()</span>
+<span class="fc" id="L253">                                        .position(new LatLng(lat, lng))</span>
+<span class="fc" id="L254">                                        .icon(BitmapDescriptorFactory.fromBitmap(createCustomMarker(price, false))));</span>
+<span class="fc" id="L255">                                bikeMarkers.add(new BikeMarker(bikeMarker, bike));</span>
+<span class="fc" id="L256">                            }</span>
+<span class="nc" id="L257">                        } catch (JSONException e) {</span>
+<span class="nc" id="L258">                            e.printStackTrace();</span>
+<span class="fc" id="L259">                        }</span>
+<span class="fc" id="L260">                    }</span>
+                },
+<span class="fc" id="L262">                new Response.ErrorListener() {</span>
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+<span class="nc" id="L265">                        Log.e(&quot;Volley Error&quot;, error.toString());</span>
+<span class="nc" id="L266">                    }</span>
+                }
+        );
+<span class="fc" id="L269">        VolleySingleton.getInstance(getApplicationContext()).addToRequestQueue(jsonArrayRequest);</span>
+
+<span class="fc" id="L271">    }</span>
+
+    private void filterBikes(int priceMin, int priceMax, boolean filterClassic, boolean filterElectric) {
+<span class="nc" id="L274">        map.clear(); // Clear existing markers</span>
+<span class="nc bnc" id="L275" title="All 2 branches missed.">        for (BikeMarker bikeMarker : bikeMarkers) {</span>
+<span class="nc" id="L276">            Bike bike = bikeMarker.getBike();</span>
+<span class="nc bnc" id="L277" title="All 6 branches missed.">            if (bike.getPrice() &gt;= priceMin &amp;&amp; bike.getPrice() &lt;= priceMax &amp;&amp;</span>
+<span class="nc bnc" id="L278" title="All 6 branches missed.">                    ((filterClassic &amp;&amp; !bike.isElectric()) || (filterElectric &amp;&amp; bike.isElectric()))) {</span>
+                // Directly add a new marker for the bike
+<span class="nc" id="L280">                map.addMarker(new MarkerOptions()</span>
+<span class="nc" id="L281">                        .position(new LatLng(bike.getLatitude(), bike.getLongitude()))</span>
+<span class="nc" id="L282">                        .icon(BitmapDescriptorFactory.fromBitmap(createCustomMarker(bike.getPrice(), false))));</span>
+            }
+<span class="nc" id="L284">        }</span>
+<span class="nc" id="L285">    }</span>
+
+
+    private void fetchCurrentRental() {
+<span class="fc" id="L289">        String URL = &quot;http://10.0.2.2:8080/users/&quot; + UserManager.getInstance().getUser().getId() + &quot;/currentRental&quot;;</span>
+
+<span class="fc" id="L291">        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, URL, null,</span>
+<span class="fc" id="L292">                new Response.Listener&lt;JSONObject&gt;() {</span>
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+<span class="fc" id="L296">                            Rental currentRental = parseRental(response);</span>
+
+<span class="fc" id="L298">                            UserManager.getInstance().getUser().setCurrent_rental(currentRental);</span>
+
+<span class="pc bpc" id="L300" title="1 of 2 branches missed.">                            if (currentRental != null) {</span>
+                                // Change button
+<span class="fc" id="L302">                                Button rentNowButton = findViewById(R.id.buttonRentNow);</span>
+<span class="fc" id="L303">                                rentNowButton.setText(&quot;Stop Rental&quot;);</span>
+<span class="fc" id="L304">                                rentNowButton.setBackgroundResource(R.drawable.red_button_rounded);</span>
+<span class="fc" id="L305">                            } else {</span>
+<span class="nc" id="L306">                                Button rentNowButton = findViewById(R.id.buttonRentNow);</span>
+<span class="nc" id="L307">                                rentNowButton.setText(&quot;Rent Now&quot;);</span>
+<span class="nc" id="L308">                                rentNowButton.setBackgroundResource(R.drawable.green_button_rounded);</span>
+                            }
+<span class="nc" id="L310">                        } catch (JSONException e) {</span>
+<span class="nc" id="L311">                            Button rentNowButton = findViewById(R.id.buttonRentNow);</span>
+<span class="nc" id="L312">                            rentNowButton.setText(&quot;Rent Now&quot;);</span>
+<span class="nc" id="L313">                            rentNowButton.setBackgroundResource(R.drawable.green_button_rounded);</span>
+<span class="nc" id="L314">                            e.printStackTrace();</span>
+<span class="fc" id="L315">                        }</span>
+<span class="fc" id="L316">                    }</span>
+                },
+<span class="fc" id="L318">                new Response.ErrorListener() {</span>
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+<span class="fc" id="L321">                        Log.e(&quot;Volley Error&quot;, error.toString());</span>
+<span class="fc" id="L322">                    }</span>
+                }
+        );
+<span class="fc" id="L325">        VolleySingleton.getInstance(getApplicationContext()).addToRequestQueue(jsonObjectRequest);</span>
+
+<span class="fc" id="L327">    }</span>
+
+
+    public List&lt;Bike&gt; parseBikes(JSONArray bikeArray) throws JSONException {
+<span class="fc" id="L331">        List&lt;Bike&gt; bikes = new ArrayList&lt;&gt;();</span>
+
+<span class="fc bfc" id="L333" title="All 2 branches covered.">        for (int i = 0; i &lt; bikeArray.length(); i++) {</span>
+
+<span class="fc" id="L335">            JSONObject bikeJson = bikeArray.getJSONObject(i);</span>
+
+<span class="fc" id="L337">            int id = bikeJson.getInt(&quot;id&quot;);</span>
+<span class="fc" id="L338">            String rating = bikeJson.getString(&quot;rating&quot;);</span>
+<span class="fc" id="L339">            boolean electric = bikeJson.getBoolean(&quot;electric&quot;);</span>
+<span class="fc" id="L340">            boolean onMarket = bikeJson.getBoolean(&quot;onMarket&quot;);</span>
+<span class="fc" id="L341">            String location = bikeJson.getString(&quot;location&quot;);</span>
+<span class="fc" id="L342">            int price = bikeJson.getInt(&quot;price&quot;);</span>
+<span class="fc" id="L343">            double latitude = bikeJson.getDouble(&quot;latitude&quot;);</span>
+<span class="fc" id="L344">            double longitude = bikeJson.getDouble(&quot;longitude&quot;);</span>
+<span class="fc" id="L345">            String name = bikeJson.getString(&quot;name&quot;);</span>
+<span class="fc" id="L346">            boolean inUse = bikeJson.getBoolean(&quot;use&quot;);</span>
+
+<span class="fc" id="L348">            Bike bike = new Bike(id, name, rating, inUse, electric, location, price, latitude, longitude, onMarket);</span>
+<span class="fc" id="L349">            Log.d(&quot;bikes 2&quot;, bike.toString());</span>
+<span class="fc" id="L350">            bikes.add(bike);</span>
+        }
+
+<span class="fc" id="L353">        return bikes;</span>
+    }
+
+    public Rental parseRental(JSONObject rental) throws JSONException {
+<span class="fc" id="L357">        Rental currentRental = new Rental();</span>
+<span class="fc" id="L358">        currentRental.setId(rental.getInt(&quot;id&quot;));</span>
+<span class="fc" id="L359">        currentRental.setPrice(rental.getInt(&quot;price&quot;));</span>
+<span class="fc" id="L360">        currentRental.setRenter_id(rental.getInt(&quot;renter_id&quot;));</span>
+<span class="fc" id="L361">        return currentRental;</span>
+    }
+
+    private void makeRentalStopReq() {
+<span class="fc" id="L365">        String userId = String.valueOf(UserManager.getInstance().getUser().getId());</span>
+<span class="fc" id="L366">        String URL = &quot;http://10.0.2.2:8080/rentals/stop/&quot; + userId;</span>
+
+<span class="fc" id="L368">        Log.d(&quot;StopRentRequest&quot;, &quot;Sending request to URL: &quot; + URL);</span>
+
+<span class="fc" id="L370">        StringRequest stringRequest = new StringRequest(</span>
+                Request.Method.GET,
+                URL,
+<span class="fc" id="L373">                new Response.Listener&lt;String&gt;() {</span>
+                    @Override
+                    public void onResponse(String response) {
+<span class="fc" id="L376">                        Log.d(&quot;Volley Response&quot;, response.toString());</span>
+
+                        try {
+<span class="fc" id="L379">                            JSONObject jsonObject = new JSONObject(response);</span>
+<span class="fc" id="L380">                            String message = jsonObject.getString(&quot;message&quot;);</span>
+
+<span class="pc bpc" id="L382" title="1 of 2 branches missed.">                            if (message.equals(&quot;success&quot;)) {</span>
+<span class="fc" id="L383">                                Intent intent = new Intent(MapsActivity.this, RentalReviewActivity.class);</span>
+<span class="fc" id="L384">                                startActivity(intent);</span>
+<span class="fc" id="L385">                            } else {</span>
+<span class="nc" id="L386">                                Toast.makeText(MapsActivity.this, &quot;Failed to stop rental, please try again&quot;, Toast.LENGTH_SHORT).show();</span>
+                            }
+<span class="nc" id="L388">                        } catch (Exception e) {</span>
+<span class="nc" id="L389">                            e.printStackTrace();</span>
+<span class="fc" id="L390">                        }</span>
+<span class="fc" id="L391">                    }</span>
+                },
+<span class="fc" id="L393">                new Response.ErrorListener() {</span>
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // Handle any errors that occur during the request
+<span class="nc" id="L397">                        Log.e(&quot;Volley Error&quot;, error.toString());</span>
+<span class="nc" id="L398">                    }</span>
+                }
+        );
+
+        // Adding request to request queue
+<span class="fc" id="L403">        VolleySingleton.getInstance(getApplicationContext()).addToRequestQueue(stringRequest);</span>
+
+<span class="fc" id="L405">    }</span>
+
+    /**
+     * Manipulates the map when it's available.
+     * This callback is triggered when the map is ready to be used.
+     */
+    @Override
+    public void onMapReady(GoogleMap map) {
+<span class="fc" id="L413">        this.map = map;</span>
+
+        // Prompt the user for permission.
+<span class="fc" id="L416">        getLocationPermission();</span>
+
+        // Turn on the My Location layer and the related control on the map.
+<span class="fc" id="L419">        updateLocationUI();</span>
+
+        // Get the current location of the device and set the position of the map.
+<span class="fc" id="L422">        getDeviceLocation();</span>
+
+<span class="fc" id="L424">        setMapStyle();</span>
+<span class="fc" id="L425">        fetchBikeLocationFromBackend();</span>
+<span class="fc" id="L426">        fetchCurrentRental();</span>
+<span class="fc" id="L427">        Log.d(&quot;bikes 1&quot;, &quot;got&quot;);</span>
+
+<span class="fc" id="L429">        map.setOnMarkerClickListener(marker -&gt; {</span>
+<span class="fc" id="L430">            BikeMarker clickedBikeMarker = null;</span>
+<span class="pc bpc" id="L431" title="1 of 2 branches missed.">            for (BikeMarker bikeMarker : bikeMarkers) {</span>
+<span class="pc bpc" id="L432" title="1 of 2 branches missed.">                if (bikeMarker.getMarker().equals(marker)) {</span>
+<span class="fc" id="L433">                    clickedBikeMarker = bikeMarker;</span>
+<span class="fc" id="L434">                    break;</span>
+                }
+<span class="nc" id="L436">            }</span>
+<span class="pc bpc" id="L437" title="1 of 2 branches missed.">            if (clickedBikeMarker != null) {</span>
+<span class="pc bpc" id="L438" title="1 of 2 branches missed.">                if (clickedBikeMarker.isHighlighted()) {</span>
+<span class="nc" id="L439">                    marker.setIcon(BitmapDescriptorFactory.fromBitmap(createCustomMarker(clickedBikeMarker.getBike().getPrice(), false)));</span>
+<span class="nc" id="L440">                    clickedBikeMarker.setHighlighted(false);</span>
+                } else {
+<span class="fc bfc" id="L442" title="All 2 branches covered.">                    for (BikeMarker bikeMarker : bikeMarkers) {</span>
+<span class="fc" id="L443">                        bikeMarker.getMarker().setIcon(BitmapDescriptorFactory.fromBitmap(createCustomMarker(bikeMarker.getBike().getPrice(), false)));</span>
+<span class="fc" id="L444">                        bikeMarker.setHighlighted(false);</span>
+<span class="fc" id="L445">                    }</span>
+<span class="fc" id="L446">                    marker.setIcon(BitmapDescriptorFactory.fromBitmap(createCustomMarker(clickedBikeMarker.getBike().getPrice(), true)));</span>
+<span class="fc" id="L447">                    clickedBikeMarker.setHighlighted(true);</span>
+                }
+            }
+<span class="fc" id="L450">            this.focusedMarker = marker;</span>
+<span class="fc" id="L451">            BikeManager.getInstance().setBike(clickedBikeMarker.getBike());</span>
+<span class="fc" id="L452">            return true;</span>
+        });
+<span class="fc" id="L454">    }</span>
+
+    /**
+     * Saves the state of the map when the activity is paused.
+     */
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+<span class="pc bpc" id="L461" title="1 of 2 branches missed.">        if (map != null) {</span>
+<span class="fc" id="L462">            outState.putParcelable(KEY_CAMERA_POSITION, map.getCameraPosition());</span>
+<span class="fc" id="L463">            outState.putParcelable(KEY_LOCATION, lastKnownLocation);</span>
+        }
+<span class="fc" id="L465">        super.onSaveInstanceState(outState);</span>
+<span class="fc" id="L466">    }</span>
+
+
+
+
+    private void setMapStyle() {
+<span class="fc" id="L472">        boolean result = this.map.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.map_style));</span>
+<span class="pc bpc" id="L473" title="1 of 2 branches missed.">        if (!result) {</span>
+<span class="nc" id="L474">            Log.e(&quot;Map&quot;, &quot;Error setting map style&quot;);</span>
+        }
+<span class="fc" id="L476">    }</span>
+
+
+    /**
+     * Gets the current location of the device, and positions the map's camera.
+     */
+    private void getDeviceLocation() {
+        /*
+         * Get the best and most recent location of the device, which may be null in rare
+         * cases when a location is not available.
+         */
+        try {
+<span class="pc bpc" id="L488" title="1 of 2 branches missed.">            if (locationPermissionGranted) {</span>
+<span class="fc" id="L489">                Task&lt;Location&gt; locationResult = fusedLocationProviderClient.getLastLocation();</span>
+<span class="fc" id="L490">                locationResult.addOnCompleteListener(this, new OnCompleteListener&lt;Location&gt;() {</span>
+                    @Override
+                    public void onComplete(@NonNull Task&lt;Location&gt; task) {
+<span class="pc bpc" id="L493" title="1 of 2 branches missed.">                        if (task.isSuccessful()) {</span>
+                            // Set the map's camera position to the current location of the device.
+<span class="fc" id="L495">                            lastKnownLocation = task.getResult();</span>
+<span class="pc bpc" id="L496" title="1 of 2 branches missed.">                            if (lastKnownLocation != null) {</span>
+<span class="fc" id="L497">                                map.moveCamera(CameraUpdateFactory.newLatLngZoom(</span>
+<span class="fc" id="L498">                                        new LatLng(lastKnownLocation.getLatitude(),</span>
+<span class="fc" id="L499">                                                lastKnownLocation.getLongitude()), DEFAULT_ZOOM));</span>
+                            }
+                        } else {
+<span class="nc" id="L502">                            Log.d(TAG, &quot;Current location is null. Using defaults.&quot;);</span>
+<span class="nc" id="L503">                            Log.e(TAG, &quot;Exception: %s&quot;, task.getException());</span>
+<span class="nc" id="L504">                            map.moveCamera(CameraUpdateFactory</span>
+<span class="nc" id="L505">                                    .newLatLngZoom(defaultLocation, DEFAULT_ZOOM));</span>
+<span class="nc" id="L506">                            map.getUiSettings().setMyLocationButtonEnabled(false);</span>
+                        }
+<span class="fc" id="L508">                    }</span>
+                });
+            }
+<span class="nc" id="L511">        } catch (SecurityException e)  {</span>
+<span class="nc" id="L512">            Log.e(&quot;Exception: %s&quot;, e.getMessage(), e);</span>
+<span class="fc" id="L513">        }</span>
+<span class="fc" id="L514">    }</span>
+
+    /**
+     * Prompts the user for permission to use the device location.
+     */
+    private void getLocationPermission() {
+        /*
+         * Request location permission, so that we can get the location of the
+         * device. The result of the permission request is handled by a callback,
+         * onRequestPermissionsResult.
+         */
+<span class="pc bpc" id="L525" title="1 of 2 branches missed.">        if (ContextCompat.checkSelfPermission(this.getApplicationContext(),</span>
+                android.Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+<span class="fc" id="L528">            locationPermissionGranted = true;</span>
+        } else {
+<span class="nc" id="L530">            ActivityCompat.requestPermissions(this,</span>
+                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
+                    PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
+        }
+<span class="fc" id="L534">    }</span>
+
+    /**
+     * Handles the result of the request for location permissions.
+     */
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+<span class="nc" id="L543">        locationPermissionGranted = false;</span>
+<span class="nc bnc" id="L544" title="All 2 branches missed.">        if (requestCode</span>
+                == PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION) {// If request is cancelled, the result arrays are empty.
+<span class="nc bnc" id="L546" title="All 4 branches missed.">            if (grantResults.length &gt; 0</span>
+                    &amp;&amp; grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+<span class="nc" id="L548">                locationPermissionGranted = true;</span>
+            }
+        } else {
+<span class="nc" id="L551">            super.onRequestPermissionsResult(requestCode, permissions, grantResults);</span>
+        }
+<span class="nc" id="L553">        updateLocationUI();</span>
+<span class="nc" id="L554">    }</span>
+
+
+    /**
+     * Updates the map's UI settings based on whether the user has granted location permission.
+     */
+    private void updateLocationUI() {
+<span class="pc bpc" id="L561" title="1 of 2 branches missed.">        if (map == null) {</span>
+<span class="nc" id="L562">            return;</span>
+        }
+        try {
+<span class="pc bpc" id="L565" title="1 of 2 branches missed.">            if (locationPermissionGranted) {</span>
+<span class="fc" id="L566">                map.setMyLocationEnabled(true);</span>
+<span class="fc" id="L567">                map.getUiSettings().setMyLocationButtonEnabled(true);</span>
+            } else {
+<span class="nc" id="L569">                map.setMyLocationEnabled(false);</span>
+<span class="nc" id="L570">                map.getUiSettings().setMyLocationButtonEnabled(false);</span>
+<span class="nc" id="L571">                lastKnownLocation = null;</span>
+<span class="nc" id="L572">                getLocationPermission();</span>
+            }
+<span class="nc" id="L574">        } catch (SecurityException e)  {</span>
+<span class="nc" id="L575">            Log.e(&quot;Exception: %s&quot;, e.getMessage());</span>
+<span class="fc" id="L576">        }</span>
+<span class="fc" id="L577">    }</span>
+
+    private Bitmap createCustomMarker(int price, boolean tapped) {
+
+<span class="fc" id="L581">        View markerLayout = getLayoutInflater().inflate(R.layout.marker_layout, null);</span>
+
+<span class="fc" id="L583">        TextView txt_price = markerLayout.findViewById(R.id.markerText);</span>
+<span class="fc" id="L584">        txt_price.setText(&quot;$&quot; + String.valueOf(price) + &quot;/hr&quot;);</span>
+
+<span class="fc bfc" id="L586" title="All 2 branches covered.">        if (tapped) {</span>
+<span class="fc" id="L587">            markerLayout.setBackgroundResource(R.drawable.marker_tapped);</span>
+        } else {
+<span class="fc" id="L589">            markerLayout.setBackgroundResource(R.drawable.marker);</span>
+        }
+
+<span class="fc" id="L592">        markerLayout.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);</span>
+<span class="fc" id="L593">        markerLayout.layout(0, 0, markerLayout.getMeasuredWidth(), markerLayout.getMeasuredHeight());</span>
+
+<span class="fc" id="L595">        final Bitmap bitmap = Bitmap.createBitmap(markerLayout.getMeasuredWidth(), markerLayout.getMeasuredHeight(), Bitmap.Config.ARGB_8888);</span>
+<span class="fc" id="L596">        Canvas canvas = new Canvas(bitmap);</span>
+<span class="fc" id="L597">        markerLayout.draw(canvas);</span>
+
+<span class="fc" id="L599">        return bitmap;</span>
+    }
+
+    public class BikeMarker {
+        private Marker marker;
+        private Bike bike;
+        private boolean isHighlighted;
+
+<span class="fc" id="L607">        public BikeMarker(Marker marker, Bike bike) {</span>
+<span class="fc" id="L608">            this.marker = marker;</span>
+<span class="fc" id="L609">            this.bike = bike;</span>
+<span class="fc" id="L610">        }</span>
+
+        public Marker getMarker() {
+<span class="fc" id="L613">            return marker;</span>
+        }
+
+        public Bike getBike() {
+<span class="fc" id="L617">            return bike;</span>
+        }
+        public boolean isHighlighted() {
+<span class="fc" id="L620">            return isHighlighted;</span>
+        }
+        public void setHighlighted(boolean highlighted) {
+<span class="fc" id="L623">            isHighlighted = highlighted;</span>
+<span class="fc" id="L624">        }</span>
+
+        public void setMarker(Marker newMarker) {
+<span class="nc" id="L627">            this.marker = newMarker;</span>
+<span class="nc" id="L628">        }</span>
+    }
+
+    @Override
+    public void onWebSocketOpen(ServerHandshake handshakedata) {
+
+<span class="fc" id="L634">    }</span>
+
+    @Override
+    public void onWebSocketMessage(String message) {
+<span class="fc" id="L638">        runOnUiThread(() -&gt; {</span>
+            try {
+                // Convert the string message into a JSONObject
+<span class="fc" id="L641">                JSONObject jsonObject = new JSONObject(message);</span>
+
+                // Extract the values for 'alertType' and 'bikeId'
+<span class="fc" id="L644">                String alertType = jsonObject.getString(&quot;alertType&quot;);</span>
+<span class="fc" id="L645">                int bikeId = jsonObject.getInt(&quot;bikeId&quot;);</span>
+
+<span class="fc bfc" id="L647" title="All 2 branches covered.">                if (alertType.equals(&quot;bikeRented&quot;)) {</span>
+<span class="fc" id="L648">                    Iterator&lt;BikeMarker&gt; iterator = this.bikeMarkers.iterator();</span>
+<span class="fc bfc" id="L649" title="All 2 branches covered.">                    while (iterator.hasNext()) {</span>
+<span class="fc" id="L650">                        BikeMarker bm = iterator.next();</span>
+<span class="fc bfc" id="L651" title="All 2 branches covered.">                        if (bm.getBike().getId() == bikeId) {</span>
+<span class="fc" id="L652">                            Log.d(&quot;MapsActivity&quot;, &quot;Removing bike: &quot; + bikeId);</span>
+<span class="fc" id="L653">                            iterator.remove(); // Removes the current bike marker</span>
+                        }
+<span class="fc" id="L655">                    }</span>
+<span class="fc" id="L656">                    map.clear();</span>
+<span class="fc" id="L657">                    fetchBikeLocationFromBackend();</span>
+<span class="fc" id="L658">                } else {</span>
+<span class="fc" id="L659">                    fetchBikeLocationFromBackend();</span>
+                }
+
+                // Do something with the extracted values. For now, let's just log them
+<span class="fc" id="L663">                Log.d(&quot;WebSocketListener&quot;, &quot;Received Alert Type: &quot; + alertType + &quot;, Bike ID: &quot; + bikeId);</span>
+
+                // Add additional UI related tasks here. Be mindful that you're on UI thread.
+
+<span class="nc" id="L667">            } catch (JSONException e) {</span>
+                // The message doesn't seem to be in the expected format. Handle the error.
+<span class="nc" id="L669">                Log.e(&quot;WebSocketException&quot;, &quot;Error parsing JSON: &quot; + e.getMessage());</span>
+<span class="fc" id="L670">            }</span>
+<span class="fc" id="L671">        });</span>
+<span class="fc" id="L672">    }</span>
+
+    @Override
+    public void onWebSocketClose(int code, String reason, boolean remote) {
+
+<span class="nc" id="L677">    }</span>
+
+    @Override
+    public void onWebSocketError(Exception ex) {
+
+<span class="nc" id="L682">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span>Generated by the Android Gradle plugin 8.1.1</div></body></html>

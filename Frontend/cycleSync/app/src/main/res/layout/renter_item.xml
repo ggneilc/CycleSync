@@ -1,0 +1,29 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="10dp">
+
+    <TextView
+        android:id="@+id/renter_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:layout_alignParentStart="true"
+        android:layout_centerVertical="true"/>
+
+    <Button
+        android:id="@+id/chat_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Message"
+        style="@style/GreenButton"
+        android:fontFamily="@font/poppins_semibold"
+        android:textFontWeight="500"
+        android:stateListAnimator="@null"
+        android:textAllCaps="false"
+        android:textSize="16sp"
+        android:background="@drawable/green_button_rounded"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"/>
+
+</RelativeLayout>

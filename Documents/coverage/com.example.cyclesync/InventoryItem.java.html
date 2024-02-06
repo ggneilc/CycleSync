@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>InventoryItem.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=0;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">debug</a> &gt; <a href="index.source.html" class="el_package">com.example.cyclesync</a> &gt; <span class="el_source">InventoryItem.java</span></div><h1>InventoryItem.java</h1><pre class="source lang-java linenums">package com.example.cyclesync;
+
+import android.content.Context;
+import android.graphics.drawable.Drawable;
+import android.util.AttributeSet;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+import net.cachapa.expandablelayout.ExpandableLayout;
+import android.util.Log;
+import android.content.res.TypedArray;
+import android.widget.Button;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+import android.widget.Toast;
+import android.content.Intent;
+
+public class InventoryItem extends RelativeLayout {
+    private Button deleteButton;
+    private Bike currentBike;
+    private ExpandableLayout expandableLayout;
+    private ImageView inventoryIcon;
+    private ImageView arrow;
+    private TextView inventoryText1;
+    private TextView priceValue;
+    private TextView locationValue;
+    private TextView ratingValue;
+    private TextView inUseValue;
+
+    public InventoryItem(Context context) {
+<span class="fc" id="L36">        super(context);</span>
+<span class="fc" id="L37">        init(null);</span>
+<span class="fc" id="L38">    }</span>
+
+    public InventoryItem(Context context, AttributeSet attrs) {
+<span class="nc" id="L41">        super(context, attrs);</span>
+<span class="nc" id="L42">        init(attrs);</span>
+<span class="nc" id="L43">    }</span>
+
+    private void init(AttributeSet attrs) {
+<span class="fc" id="L46">        LayoutInflater.from(getContext()).inflate(R.layout.inventory_item, this, true);</span>
+
+<span class="fc" id="L48">        inventoryIcon = findViewById(R.id.inventoryIcon);</span>
+<span class="fc" id="L49">        inventoryText1 = findViewById(R.id.inventoryText1);</span>
+<span class="fc" id="L50">        arrow = findViewById(R.id.arrow);</span>
+<span class="fc" id="L51">        expandableLayout = findViewById(R.id.expandableLayout);</span>
+<span class="fc" id="L52">        priceValue = findViewById(R.id.price_value);</span>
+<span class="fc" id="L53">        locationValue = findViewById(R.id.location_value);</span>
+<span class="fc" id="L54">        ratingValue = findViewById(R.id.rating_value);</span>
+<span class="fc" id="L55">        inUseValue = findViewById(R.id.inUse_value);</span>
+
+<span class="fc" id="L57">        RelativeLayout inventoryItemLayout = findViewById(R.id.inventoryItemLayout);</span>
+<span class="fc" id="L58">        inventoryItemLayout.setOnClickListener(new OnClickListener() {</span>
+            @Override
+            public void onClick(View v) {
+<span class="fc" id="L61">                Log.d(&quot;InventoryItemClick&quot;, &quot;Layout Clicked!&quot;);</span>
+<span class="pc bpc" id="L62" title="1 of 2 branches missed.">                if (expandableLayout.isExpanded()) {</span>
+<span class="nc" id="L63">                    expandableLayout.collapse();</span>
+<span class="nc" id="L64">                    arrow.animate().rotation(0).setDuration(300).start();</span>
+                } else {
+<span class="fc" id="L66">                    expandableLayout.expand();</span>
+<span class="fc" id="L67">                    arrow.animate().rotation(180).setDuration(300).start();</span>
+                }
+<span class="fc" id="L69">            }</span>
+        });
+
+<span class="fc" id="L72">        Button edit = findViewById(R.id.edit_inventory_item);</span>
+<span class="fc" id="L73">        edit.setOnClickListener(new OnClickListener() {</span>
+            @Override
+            public void onClick(View v) {
+<span class="nc bnc" id="L76" title="All 2 branches missed.">                if (currentBike != null) {</span>
+<span class="nc" id="L77">                    Intent intent = getEditBikeIntent();</span>
+<span class="nc" id="L78">                    getContext().startActivity(intent);</span>
+                }
+<span class="nc" id="L80">            }</span>
+        });
+
+<span class="pc bpc" id="L83" title="1 of 2 branches missed.">        if (attrs != null) {</span>
+<span class="nc" id="L84">            TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.InventoryItem, 0, 0);</span>
+<span class="nc" id="L85">            Drawable icon = a.getDrawable(R.styleable.InventoryItem_inventoryIcon);</span>
+<span class="nc" id="L86">            String text1 = a.getString(R.styleable.InventoryItem_inventoryText1);</span>
+
+<span class="nc bnc" id="L88" title="All 2 branches missed.">            if (icon != null) {</span>
+<span class="nc" id="L89">                inventoryIcon.setImageDrawable(icon);</span>
+            }
+<span class="nc bnc" id="L91" title="All 2 branches missed.">            if (text1 != null) {</span>
+<span class="nc" id="L92">                inventoryText1.setText(text1);</span>
+            }
+<span class="nc" id="L94">            a.recycle();</span>
+        }
+
+<span class="fc" id="L97">        deleteButton = findViewById(R.id.delete_inventory_item);</span>
+<span class="fc" id="L98">        deleteButton.setOnClickListener(new OnClickListener() {</span>
+            @Override
+            public void onClick(View v) {
+<span class="fc" id="L101">                deleteBikeById(currentBike.getId());</span>
+<span class="fc" id="L102">            }</span>
+        });
+<span class="fc" id="L104">    }</span>
+
+    public void deleteBikeById(int id) {
+<span class="fc" id="L107">        String URL = &quot;http://10.0.2.2:8080/bikes/&quot; + id;</span>
+
+<span class="fc" id="L109">        StringRequest stringRequest = new StringRequest(</span>
+                Request.Method.DELETE,
+                URL,
+<span class="fc" id="L112">                new Response.Listener&lt;String&gt;() {</span>
+                    @Override
+                    public void onResponse(String response) {
+<span class="fc" id="L115">                        Log.d(&quot;Volley Delete Response&quot;, response);</span>
+<span class="fc" id="L116">                        Toast.makeText(getContext(), &quot;Bike deleted successfully!&quot;, Toast.LENGTH_SHORT).show();</span>
+<span class="fc" id="L117">                    }</span>
+                },
+<span class="fc" id="L119">                new Response.ErrorListener() {</span>
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+<span class="nc" id="L122">                        Log.e(&quot;Volley Delete Error&quot;, error.toString());</span>
+<span class="nc" id="L123">                        Toast.makeText(getContext(), &quot;Failed to delete bike!&quot;, Toast.LENGTH_SHORT).show();</span>
+<span class="nc" id="L124">                    }</span>
+                }
+        );
+
+<span class="fc" id="L128">        Volley.newRequestQueue(getContext()).add(stringRequest);</span>
+<span class="fc" id="L129">    }</span>
+
+    public void setIcon(Drawable icon) {
+<span class="nc" id="L132">        inventoryIcon.setImageDrawable(icon);</span>
+<span class="nc" id="L133">    }</span>
+
+    public void setText1(String text) {
+<span class="fc" id="L136">        inventoryText1.setText(text);</span>
+<span class="fc" id="L137">    }</span>
+
+    public void updateInventoryItem(Bike bike) {
+<span class="pc bpc" id="L140" title="1 of 2 branches missed.">        if (bike.isElectric()) {</span>
+<span class="nc" id="L141">            inventoryIcon.setImageResource(R.drawable.electric_icon);</span>
+        } else {
+<span class="fc" id="L143">            inventoryIcon.setImageResource(R.drawable.become_renter_setting);</span>
+        }
+<span class="fc" id="L145">        currentBike = bike;</span>
+<span class="fc" id="L146">        inventoryText1.setText(bike.getName());</span>
+<span class="fc" id="L147">        priceValue.setText(formatPrice(bike.getPrice()));</span>
+<span class="fc" id="L148">        locationValue.setText(bike.getLocation());</span>
+<span class="fc" id="L149">        ratingValue.setText(bike.getRating()); // directly using the String rating</span>
+<span class="pc bpc" id="L150" title="1 of 2 branches missed.">        inUseValue.setText(bike.isInUse() ? &quot;In Use&quot; : &quot;Available&quot;);</span>
+<span class="fc" id="L151">    }</span>
+
+    private String formatPrice(int price) {
+<span class="fc" id="L154">        return String.format(&quot;$%d / hourly&quot;, price);</span>
+    }
+
+    private Intent getEditBikeIntent() {
+<span class="nc" id="L158">        Intent intent = new Intent(getContext(), EditBikeActivity.class);</span>
+<span class="nc" id="L159">        intent.putExtra(&quot;id&quot;, currentBike.getId());</span>
+<span class="nc" id="L160">        intent.putExtra(&quot;name&quot;, currentBike.getName());</span>
+<span class="nc" id="L161">        intent.putExtra(&quot;price&quot;, currentBike.getPrice());</span>
+<span class="nc" id="L162">        intent.putExtra(&quot;location&quot;, currentBike.getLocation());</span>
+<span class="nc" id="L163">        intent.putExtra(&quot;rating&quot;, currentBike.getRating());</span>
+<span class="nc" id="L164">        return intent;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span>Generated by the Android Gradle plugin 8.1.1</div></body></html>

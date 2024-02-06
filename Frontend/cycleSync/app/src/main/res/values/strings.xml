@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">CycleSync</string>
+    <string name="create_account">Create Account</string>
+    <string name="create_bike">Create Bike</string>
+    <string name="login">Login</string>
+    <string name="hint_username">Username</string>
+    <string name="hint_email">Email</string>
+    <string name="hint_password">Password</string>
+    <string name="title_activity_maps">MapsActivity</string>
+    <string name="Rent_Now">Rent Now</string>
+    <string name="add_image">Add Image</string>
+    <string name="profile_picture">Profile Picture</string>
+    <string name="change_picture">Change Picture</string>
+    <string name="inventory_title">Inventory</string>
+    <string name="choose_picture_source">Choose Picture Source</string>
+
+
+</resources>

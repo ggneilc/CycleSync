@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">AS1</string>
+    <string name="create_account">Create Account</string>
+    <string name="login">Login</string>
+    <string name="hint_username">Username</string>
+    <string name="hint_password">Password</string>
+</resources>

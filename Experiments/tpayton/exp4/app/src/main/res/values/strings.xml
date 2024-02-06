@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">AS1</string>
+    <string name="create_account">Create Account</string>
+    <string name="login">Login</string>
+    <string name="hint_username">Username</string>
+    <string name="hint_password">Password</string>
+    <string name="title_activity_maps">MapsActivity</string>
+    <string name="Rent_Now">Rent Now</string>
+    <string name="add_image">Add Image</string>
+    <string name="profile_picture">Profile Picture</string>
+    <string name="change_picture">Change Picture</string>
+    <string name="choose_picture_source">Choose Picture Source</string>
+
+</resources>

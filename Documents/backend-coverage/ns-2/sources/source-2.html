@@ -1,0 +1,214 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > BikeController</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">cyclesync.Bikes</a>
+</div>
+
+<h1>Coverage Summary for Class: BikeController (cyclesync.Bikes)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BikeController</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (6/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    36.4%
+  </span>
+  <span class="absValue">
+    (12/33)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package cyclesync.Bikes;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import org.springframework.beans.factory.annotation.Autowired;
+&nbsp;import org.springframework.web.bind.annotation.GetMapping;
+&nbsp;import org.springframework.web.bind.annotation.PathVariable;
+&nbsp;import org.springframework.web.bind.annotation.PostMapping;
+&nbsp;import org.springframework.web.bind.annotation.DeleteMapping;
+&nbsp;import org.springframework.web.bind.annotation.PutMapping;
+&nbsp;import org.springframework.web.bind.annotation.RequestBody;
+&nbsp;import org.springframework.web.bind.annotation.RestController;
+&nbsp;import cyclesync.Users.User;
+&nbsp;import cyclesync.Users.UserRepository;
+&nbsp;import java.util.Optional;
+&nbsp;import cyclesync.Websockets.GlobalBikeMap;
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;/**
+&nbsp; * @Author Neil Choromokos &amp; Caleb Lemmons
+&nbsp; * Neil: Setup class: Constructors, getters, setters
+&nbsp; * Holden: fixed functionality for frontend
+&nbsp; */
+&nbsp;@RestController
+<b class="fc">&nbsp;public class BikeController {</b>
+&nbsp;
+&nbsp;    @Autowired
+&nbsp;    BikeRepository bikeRepository;
+&nbsp;    @Autowired
+&nbsp;    UserRepository userRepository;
+&nbsp;    @Autowired
+&nbsp;    private GlobalBikeMap globalBikeMap;
+<b class="fc">&nbsp;    private String success = &quot;{\&quot;message\&quot;:\&quot;success\&quot;}&quot;;</b>
+<b class="fc">&nbsp;    private String failure = &quot;{\&quot;message\&quot;:\&quot;failure\&quot;}&quot;;</b>
+&nbsp;
+&nbsp;    //-------------------------- CRUD Operations ------------------// 
+&nbsp;    @GetMapping(path = &quot;/bikes&quot;)
+&nbsp;    List&lt;Bike&gt; getAllBikes(){
+<b class="fc">&nbsp;        return bikeRepository.findAll();</b>
+&nbsp;    }
+&nbsp;    @GetMapping(path = &quot;/bikes/{id}&quot;)
+&nbsp;    Bike getBikeById( @PathVariable int id){
+<b class="fc">&nbsp;        return bikeRepository.findById(id).orElse(null);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    //Bike takes in User, Color, Name. Bikes are tied to a user&#39;s garage
+&nbsp;    @PostMapping(path = &quot;/users/{id}/bikes&quot;)
+&nbsp;    String createBike(@PathVariable int id, @RequestBody Bike bike) {
+<b class="fc">&nbsp;        User user = userRepository.findById(id).orElse(null);</b>
+<b class="fc">&nbsp;        if (user == null || bike == null) {</b>
+<b class="fc">&nbsp;            return failure;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        bike.setUser(user);</b>
+&nbsp;        //user.getBikes().add(bike);  // Add the bike to the user&#39;s list of bikes
+&nbsp;        //userRepository.save(user);  // Save the updated user to ensure both sides of relationship are updated
+<b class="nc">&nbsp;        bikeRepository.save(bike);</b>
+&nbsp;
+<b class="nc">&nbsp;        String rentalJson = &quot;{\&quot;alertType\&quot;:\&quot;bikeOpen\&quot;, \&quot;bikeId\&quot;:&quot;+bike.getId()+&quot;}&quot;;</b>
+<b class="nc">&nbsp;        globalBikeMap.broadcast(rentalJson);</b>
+&nbsp;
+<b class="nc">&nbsp;        return success;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;    @PutMapping(&quot;/bikes/{id}&quot;)
+&nbsp;    public String updateBike(@PathVariable int id, @RequestBody Bike request) {
+<b class="fc">&nbsp;        Optional&lt;Bike&gt; optionalBike = bikeRepository.findById(id);</b>
+<b class="fc">&nbsp;        if (!optionalBike.isPresent()) {</b>
+<b class="fc">&nbsp;            return failure;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        Bike bikeToUpdate = optionalBike.get();</b>
+&nbsp;
+&nbsp;        // Copy attributes from request to bike here
+<b class="nc">&nbsp;        if (request.getName() != null) {</b>
+<b class="nc">&nbsp;            bikeToUpdate.setName(request.getName());</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (request.getPrice() != 0) {</b>
+<b class="nc">&nbsp;            bikeToUpdate.setPrice(request.getPrice());</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (request.getLocation() != null) {</b>
+<b class="nc">&nbsp;            bikeToUpdate.setLocation(request.getLocation());</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (request.getRating() != null) {</b>
+<b class="nc">&nbsp;            bikeToUpdate.setRating(request.getRating());</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if(request.getLatitude() != null){</b>
+<b class="nc">&nbsp;            bikeToUpdate.setLatitude(request.getLatitude());</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if(request.getLongitude() != null){</b>
+<b class="nc">&nbsp;            bikeToUpdate.setLongitude(request.getLongitude());</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Save the updated bike
+<b class="nc">&nbsp;        bikeRepository.save(bikeToUpdate);</b>
+&nbsp;
+<b class="nc">&nbsp;        return success;</b>
+&nbsp;    }
+&nbsp;      
+&nbsp;    @DeleteMapping(path = &quot;/bikes/{id}&quot;)
+&nbsp;    String deleteBike(@PathVariable int id){
+<b class="fc">&nbsp;        bikeRepository.deleteById(id);</b>
+<b class="nc">&nbsp;        return success;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2023-12-07 18:44</div>
+</div>
+</body>
+</html>

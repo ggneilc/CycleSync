@@ -1,0 +1,311 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > Bike</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">cyclesync.Bikes</a>
+</div>
+
+<h1>Coverage Summary for Class: Bike (cyclesync.Bikes)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Bike</td>
+<td class="coverageStat">
+  <span class="percent">
+    80.8%
+  </span>
+  <span class="absValue">
+    (21/26)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    45.7%
+  </span>
+  <span class="absValue">
+    (21/46)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">Bike$HibernateProxy$awtGHykx</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    80.8%
+  </span>
+  <span class="absValue">
+    (21/26)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    45.7%
+  </span>
+  <span class="absValue">
+    (21/46)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package cyclesync.Bikes;
+&nbsp;
+&nbsp;import javax.persistence.*;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import com.fasterxml.jackson.annotation.JsonIgnore;
+&nbsp;
+&nbsp;import cyclesync.Users.User;
+&nbsp;import cyclesync.Rentals.Rental;
+&nbsp;/**
+&nbsp; * @Author Neil Choromokos &amp; Caleb Lemmons
+&nbsp; * Neil: Fixed associations
+&nbsp; * Caleb: Setup Class: Constructors, getters, setters
+&nbsp; * Holden: Added longitude &amp; latitude
+&nbsp; */
+&nbsp;@Entity
+&nbsp;public class Bike {
+&nbsp;
+&nbsp;    /* 
+&nbsp;     * The annotation @ID marks the field below as the primary key for the table created by springboot
+&nbsp;     * The @GeneratedValue generates a value if not already present, The strategy in this case is to start from 1 and increment for each table
+&nbsp;     */
+&nbsp;    @GeneratedValue(strategy = GenerationType.IDENTITY)
+&nbsp;    @Id
+&nbsp;    private int id;
+&nbsp;
+&nbsp;
+&nbsp;    private String bikeName;
+&nbsp;    private String type;
+&nbsp;    private String rating;
+&nbsp;
+&nbsp;    @ElementCollection
+&nbsp;    private List&lt;Integer&gt; ratings;
+&nbsp;    private boolean inUse;
+&nbsp;    private boolean electric;
+&nbsp;    private boolean onMarket;
+&nbsp;
+&nbsp;    private String location;
+&nbsp;
+&nbsp;    private int price;
+&nbsp;
+&nbsp;    private Double latitude;
+&nbsp;    private Double longitude;
+&nbsp;
+&nbsp;    /*
+&nbsp;     * @ManyToOne tells springboot that multiple instances of Phone can map to one instance of OR multiple rows of the phone table can map to one user row
+&nbsp;     * @JoinColumn specifies the ownership of the key i.e. The Phone table will contain a foreign key from the User table and the column name will be user_id
+&nbsp;     * @JsonIgnore is to assure that there is no infinite loop while returning either user/phone objects (phone-&gt;user-&gt;[phones]-&gt;...)
+&nbsp;     */
+&nbsp;    //muliple bikes are owend by one user
+&nbsp;    @ManyToOne
+&nbsp;    @JoinColumn(name = &quot;user_id&quot;)
+&nbsp;    @JsonIgnore
+&nbsp;    private User user;
+&nbsp;
+&nbsp;    @OneToOne
+&nbsp;    @JsonIgnore
+&nbsp;    private Rental rental;
+&nbsp;
+&nbsp;     // =============================== Constructors ================================== //
+&nbsp;
+<b class="fc">&nbsp;    public Bike(){</b>
+&nbsp;
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public Bike(User user, String rating, String name, boolean electric, String location, int price, Double latitude, Double longitude, boolean onMarket) {</b>
+<b class="nc">&nbsp;        this.user = user;</b>
+<b class="nc">&nbsp;        this.rating = rating;</b>
+<b class="nc">&nbsp;        this.bikeName = name;</b>
+<b class="nc">&nbsp;        this.inUse = false;</b>
+<b class="nc">&nbsp;        this.electric = electric;</b>
+<b class="nc">&nbsp;        this.location = location;</b>
+<b class="nc">&nbsp;        this.latitude = latitude;</b>
+<b class="nc">&nbsp;        this.longitude = longitude;</b>
+<b class="nc">&nbsp;        this.price = price;</b>
+<b class="nc">&nbsp;        this.onMarket = true;</b>
+<b class="nc">&nbsp;        this.ratings = new ArrayList&lt;Integer&gt;();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;    // =============================== Getters and Setters for each field ================================== //
+&nbsp;
+&nbsp;
+&nbsp;
+<b class="fc">&nbsp;    public boolean getonMarket(){return this.onMarket;}</b>
+&nbsp;    public void setOnMarket(boolean onMarket) {
+<b class="fc">&nbsp;        this.onMarket = onMarket;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public int getId() {
+<b class="fc">&nbsp;        return id;</b>
+&nbsp;    }
+&nbsp;    public void setId(int id) {
+<b class="fc">&nbsp;        this.id = id;</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    public int getPrice(){return this.price;}</b>
+&nbsp;
+<b class="fc">&nbsp;    public void setPrice(int price){this.price = price;}</b>
+&nbsp;
+&nbsp;
+&nbsp;    public User getUser() {
+<b class="nc">&nbsp;        return user;</b>
+&nbsp;    }
+&nbsp;    public void setUser(User user) {
+&nbsp;        // Remove the bike from the previous user&#39;s list of bikes
+<b class="nc">&nbsp;        if (this.user != null) {</b>
+<b class="nc">&nbsp;            this.user.getBikes().remove(this);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Set the new user
+<b class="nc">&nbsp;        this.user = user;</b>
+&nbsp;
+&nbsp;        // Add the bike to the new user&#39;s list of bikes
+<b class="nc">&nbsp;        if (user != null &amp;&amp; !user.getBikes().contains(this)) {</b>
+<b class="nc">&nbsp;            user.getBikes().add(this);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isElectric() {
+<b class="fc">&nbsp;        return electric;</b>
+&nbsp;    }
+<b class="fc">&nbsp;    public String getLocation(){return this.location;}</b>
+&nbsp;
+&nbsp;    public void setLocation(String location){
+<b class="fc">&nbsp;        this.location = location;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setLatitude(Double latitude){
+<b class="fc">&nbsp;        this.latitude = latitude;</b>
+&nbsp;    }
+&nbsp;    public void setLongitude(Double longitude){
+<b class="fc">&nbsp;        this.longitude = longitude;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Double getLatitude( ){
+<b class="fc">&nbsp;        return this.latitude = latitude;</b>
+&nbsp;    }
+&nbsp;    public Double getLongitude( ){
+<b class="fc">&nbsp;        return this.longitude = longitude;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;    public void setElectric(boolean electric) {
+<b class="fc">&nbsp;        this.electric = electric;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    public String getRating() {
+<b class="fc">&nbsp;        return this.rating;</b>
+&nbsp;    }
+&nbsp;    public void setRating(String rating) {
+<b class="fc">&nbsp;        this.rating = rating;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    public String getName() {
+<b class="fc">&nbsp;        return bikeName;</b>
+&nbsp;    }
+&nbsp;    public void setName(String name) {
+<b class="fc">&nbsp;        this.bikeName = name;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    public boolean getUse() {
+<b class="fc">&nbsp;        return inUse;</b>
+&nbsp;    }
+&nbsp;    public void setUse(boolean val) {
+<b class="fc">&nbsp;        this.inUse = val;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;//    public void setRental(Rental rental) {
+&nbsp;//        if (rental == null) {
+&nbsp;//            if (this.rental != null) {
+&nbsp;//                this.rental.setBike(null);
+&nbsp;//            }
+&nbsp;//        } else {
+&nbsp;//            rental.setBike(this);
+&nbsp;//        }
+&nbsp;//        this.rental = rental;
+&nbsp;//    }
+&nbsp;
+&nbsp;    public void addRating(int newRating) {
+<b class="nc">&nbsp;        this.ratings.add(newRating);</b>
+<b class="nc">&nbsp;        int total = 0;</b>
+<b class="nc">&nbsp;        for (int i: this.ratings) {</b>
+<b class="nc">&nbsp;            total += i;</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        this.rating = total / this.ratings.size() + &quot;/5&quot;;</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public Rental getRental() {return this.rental;}</b>
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2023-12-07 18:44</div>
+</div>
+</body>
+</html>

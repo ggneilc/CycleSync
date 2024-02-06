@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AddBikeActivity.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=0;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">debug</a> &gt; <a href="index.source.html" class="el_package">com.example.cyclesync</a> &gt; <span class="el_source">AddBikeActivity.java</span></div><h1>AddBikeActivity.java</h1><pre class="source lang-java linenums">package com.example.cyclesync;
+
+import android.Manifest;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
+import android.widget.ImageView;
+import androidx.appcompat.app.AppCompatActivity;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import org.json.JSONObject;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import androidx.core.app.ActivityCompat;
+
+<span class="fc" id="L30">public class AddBikeActivity extends AppCompatActivity {</span>
+    EditText nameText;
+    EditText priceText;
+    EditText locationText;
+    EditText ratingText;
+    Button buttonCreateBike;
+    private LocationManager locationManager;
+    private LocationListener locationListener;
+<span class="fc" id="L38">    private double currentLatitude = 0.0;</span>
+<span class="fc" id="L39">    private double currentLongitude = 0.0;</span>
+
+
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+<span class="fc" id="L45">        super.onCreate(savedInstanceState);</span>
+<span class="fc" id="L46">        setContentView(R.layout.add_bike_activity);</span>
+
+<span class="fc" id="L48">        nameText = findViewById(R.id.bikeName);</span>
+<span class="fc" id="L49">        priceText = findViewById(R.id.bikePrice);</span>
+<span class="fc" id="L50">        locationText = findViewById(R.id.bikeLocation);</span>
+<span class="fc" id="L51">        ratingText = findViewById(R.id.bikeRating);</span>
+<span class="fc" id="L52">        buttonCreateBike = findViewById(R.id.buttonCreateBike);</span>
+<span class="fc" id="L53">        ImageView backArrow = findViewById(R.id.back_arrow);</span>
+<span class="fc" id="L54">        Button useCurrentLocationBtn = findViewById(R.id.useCurrentLocation);</span>
+
+<span class="fc" id="L56">        backArrow.setOnClickListener(new View.OnClickListener() {</span>
+            @Override
+            public void onClick(View v) {
+<span class="nc" id="L59">                finish();</span>
+<span class="nc" id="L60">            }</span>
+        });
+
+<span class="fc" id="L63">        buttonCreateBike.setOnClickListener(new View.OnClickListener() {</span>
+            @Override
+            public void onClick(View v) {
+<span class="fc" id="L66">                String name = nameText.getText().toString();</span>
+<span class="fc" id="L67">                String price = priceText.getText().toString();</span>
+<span class="fc" id="L68">                String location = locationText.getText().toString();</span>
+<span class="fc" id="L69">                String rating = ratingText.getText().toString();</span>
+
+<span class="fc" id="L71">                createBike(name, price, location, rating, UserManager.getInstance().getUser().getId(), currentLatitude, currentLongitude);</span>
+<span class="fc" id="L72">            }</span>
+        });
+
+<span class="fc" id="L75">        useCurrentLocationBtn.setOnClickListener(new View.OnClickListener() {</span>
+            @Override
+            public void onClick(View v) {
+<span class="pc bpc" id="L78" title="1 of 2 branches missed.">                if (ActivityCompat.checkSelfPermission(AddBikeActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {</span>
+                    // Request location permissions if not granted
+<span class="nc" id="L80">                    ActivityCompat.requestPermissions(AddBikeActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);</span>
+                } else {
+                    // If permission is already granted, fetch the location
+<span class="fc" id="L83">                    locationManager.requestSingleUpdate(LocationManager.GPS_PROVIDER, locationListener, null);</span>
+                }
+<span class="fc" id="L85">            }</span>
+        });
+
+
+
+<span class="fc" id="L90">        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);</span>
+
+<span class="fc" id="L92">        locationListener = new LocationListener() {</span>
+            @Override
+            public void onLocationChanged(Location location) {
+<span class="fc" id="L95">                currentLatitude = location.getLatitude();</span>
+<span class="fc" id="L96">                currentLongitude = location.getLongitude();</span>
+
+                // Use Geocoder to get street address and city from latitude and longitude
+<span class="fc" id="L99">                Geocoder geocoder = new Geocoder(AddBikeActivity.this, Locale.getDefault());</span>
+                try {
+<span class="fc" id="L101">                    List&lt;Address&gt; addresses = geocoder.getFromLocation(currentLatitude, currentLongitude, 1);</span>
+<span class="pc bpc" id="L102" title="1 of 2 branches missed.">                    if (!addresses.isEmpty()) {</span>
+<span class="fc" id="L103">                        Address address = addresses.get(0);</span>
+
+                        // Get the street address and the city
+<span class="fc" id="L106">                        String streetAddress = address.getAddressLine(0);</span>
+<span class="fc" id="L107">                        String city = address.getLocality();</span>
+
+                        // Format it as &quot;Street Address, City&quot;
+<span class="fc" id="L110">                        String formattedAddress = streetAddress.split(&quot;,&quot;)[0] + &quot;, &quot; + city;</span>
+<span class="fc" id="L111">                        locationText.setText(formattedAddress);</span>
+                    }
+
+<span class="nc" id="L114">                } catch (Exception e) {</span>
+<span class="nc" id="L115">                    e.printStackTrace();</span>
+<span class="fc" id="L116">                }</span>
+<span class="fc" id="L117">            }</span>
+        };
+<span class="fc" id="L119">    }</span>
+
+    private void createBike(String name, String price, String location, String rating, int id, double latitude, double longitude){
+<span class="fc" id="L122">        String URL = &quot;http://10.0.2.2:8080/users/&quot; + id + &quot;/bikes&quot;;</span>
+
+
+<span class="fc" id="L125">        Map&lt;String, String&gt; params = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L126">        params.put(&quot;name&quot;, name);</span>
+<span class="fc" id="L127">        params.put(&quot;price&quot;, price);</span>
+<span class="fc" id="L128">        params.put(&quot;location&quot;, location);</span>
+<span class="fc" id="L129">        params.put(&quot;rating&quot;, rating);</span>
+<span class="fc" id="L130">        params.put(&quot;latitude&quot;, String.valueOf(latitude));</span>
+<span class="fc" id="L131">        params.put(&quot;longitude&quot;, String.valueOf(longitude));</span>
+<span class="fc" id="L132">        params.put(&quot;onMarket&quot;, String.valueOf(true));</span>
+<span class="fc" id="L133">        JSONObject parameters = new JSONObject(params);</span>
+
+<span class="fc" id="L135">        JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.POST, URL, parameters,</span>
+<span class="fc" id="L136">                new Response.Listener&lt;JSONObject&gt;() {</span>
+                    @Override
+                    public void onResponse(JSONObject response) {
+<span class="fc" id="L139">                        Log.d(&quot;Volley Response&quot;, response.toString());</span>
+
+                        try {
+<span class="fc" id="L142">                            String message = response.getString(&quot;message&quot;);</span>
+
+<span class="pc bpc" id="L144" title="1 of 2 branches missed.">                            if (message.equals(&quot;success&quot;)) {</span>
+                                // Successfully created account. You should now navigate to another activity or update the UI accordingly
+<span class="fc" id="L146">                                Intent intent = new Intent(AddBikeActivity.this, InventoryActivity.class);</span>
+<span class="fc" id="L147">                                startActivity(intent);</span>
+<span class="fc" id="L148">                                finish();</span>
+<span class="fc" id="L149">                                Toast.makeText(AddBikeActivity.this, &quot;Bike Created&quot;, Toast.LENGTH_SHORT).show();</span>
+<span class="fc" id="L150">                            } else {</span>
+                                // Something went wrong while creating the account. Handle the situation accordingly, maybe show an error message
+<span class="nc" id="L152">                                Toast.makeText(AddBikeActivity.this, &quot;Failed to create Bike, please try again&quot;, Toast.LENGTH_SHORT).show();</span>
+                            }
+<span class="nc" id="L154">                        } catch (Exception e) {</span>
+<span class="nc" id="L155">                            e.printStackTrace();</span>
+<span class="fc" id="L156">                        }</span>
+<span class="fc" id="L157">                    }</span>
+                },
+<span class="fc" id="L159">                new Response.ErrorListener() {</span>
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+<span class="nc" id="L162">                        Log.e(&quot;Volley Error&quot;, error.toString());</span>
+<span class="nc" id="L163">                    }</span>
+                }
+        );
+<span class="fc" id="L166">        VolleySingleton.getInstance(getApplicationContext()).addToRequestQueue(jsonRequest);</span>
+<span class="fc" id="L167">    }</span>
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+<span class="nc" id="L171">        super.onRequestPermissionsResult(requestCode, permissions, grantResults);</span>
+<span class="nc bnc" id="L172" title="All 2 branches missed.">        if (requestCode == 1) {</span>
+<span class="nc bnc" id="L173" title="All 4 branches missed.">            if (grantResults.length &gt; 0 &amp;&amp; grantResults[0] == PackageManager.PERMISSION_GRANTED) {</span>
+<span class="nc bnc" id="L174" title="All 2 branches missed.">                if (ActivityCompat.checkSelfPermission(AddBikeActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {</span>
+                    // Request location permissions if not granted
+<span class="nc" id="L176">                    ActivityCompat.requestPermissions(AddBikeActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);</span>
+                } else {
+                    // If permission is already granted, fetch the location
+<span class="nc" id="L179">                    locationManager.requestSingleUpdate(LocationManager.GPS_PROVIDER, locationListener, null);</span>
+                }
+            }
+        }
+<span class="nc" id="L183">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span>Generated by the Android Gradle plugin 8.1.1</div></body></html>
